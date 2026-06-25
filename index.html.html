@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FinWatch — ระบบติดตามบัญชีทีม</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+  :root {
+    --bg:#080b12; --s1:#0f1420; --s2:#161c2e; --s3:#1e2540; --bd:#252d45; --bd2:#2e3a5a;
+    --blue:#4a8fff; --green:#2dd67b; --yellow:#f5b731; --red:#f04f4f; --purple:#9b6cff; --cyan:#3ecfcf;
+    --text:#dce4f5; --muted:#6b7799; --font:'IBM Plex Sans Thai',sans-serif; --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
+
+  /* SETUP SCREEN */
+  #setup-screen{
+    position:fixed;inset:0;background:var(--bg);z-index:1000;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;
+  }
+  .setup-logo{font-size:40px;margin-bottom:8px;}
+  .setup-title{font-size:22px;font-weight:700;margin-bottom:6px;}
+  .setup-sub{font-size:13px;color:var(--muted);margin-bottom:28px;text-align:center;line-height:1.6;}
+  .setup-card{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:20px;width:100%;max-width:480px;}
+  .setup-step{display:flex;gap:10px;align-items:flex-start;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--bd);}
+  .setup-step:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+  .step-num{background:var(--blue);color:#fff;border-radius:50%;width:24px;height:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+  .step-body{flex:1;}
+  .step-title{font-weight:600;font-size:13px;margin-bottom:4px;}
+  .step-desc{font-size:12px;color:var(--muted);line-height:1.6;}
+  .step-desc a{color:var(--blue);text-decoration:none;}
+  .step-input{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 12px;outline:none;margin-top:8px;transition:border-color .2s;}
+  .step-input:focus{border-color:var(--blue);}
+  .btn-setup{width:100%;max-width:480px;background:var(--blue);color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer;margin-top:16px;transition:opacity .2s;}
+  .btn-setup:disabled{opacity:.4;cursor:not-allowed;}
+  .setup-err{color:var(--red);font-size:12px;text-align:center;margin-top:8px;min-height:18px;}
+
+  /* APP */
+  #app{display:none;}
+  .topbar{background:var(--s1);border-bottom:1px solid var(--bd);padding:12px 16px;position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-weight:700;font-size:16px;letter-spacing:-.3px;display:flex;align-items:center;gap:8px;}
+  .live-dot{width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 6px var(--green);animation:blink 2s infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+  .sync-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;font-family:var(--mono);}
+  .sync-ok{background:rgba(45,214,123,.15);color:var(--green);}
+  .sync-off{background:rgba(245,183,49,.15);color:var(--yellow);}
+  .clock{font-family:var(--mono);font-size:11px;color:var(--muted);}
+
+  .nav{display:flex;background:var(--s1);border-bottom:1px solid var(--bd);overflow-x:auto;scrollbar-width:none;}
+  .nav::-webkit-scrollbar{display:none;}
+  .nav-item{flex:1;min-width:68px;padding:10px 6px;text-align:center;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;letter-spacing:.3px;}
+  .nav-icon{font-size:17px;display:block;margin-bottom:2px;}
+  .nav-item.active{color:var(--blue);border-bottom-color:var(--blue);}
+
+  .page{display:none;padding:14px;max-width:600px;margin:0 auto;padding-bottom:28px;}
+  .page.active{display:block;}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px;}
+  .stat{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:13px;}
+  .stat-val{font-family:var(--mono);font-size:20px;font-weight:600;line-height:1;margin-bottom:4px;}
+  .stat-lbl{font-size:11px;color:var(--muted);font-weight:500;}
+
+  .card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:15px;margin-bottom:12px;}
+  .card-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;}
+
+  .acc-item{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:13px;margin-bottom:10px;transition:border-color .2s;}
+  .acc-item.frozen{border-color:rgba(240,79,79,.5);background:rgba(240,79,79,.05);}
+  .acc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;gap:6px;}
+  .acc-name{font-weight:600;font-size:14px;}
+  .acc-num{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px;}
+  .acc-balance{font-family:var(--mono);font-size:21px;font-weight:600;margin-bottom:6px;}
+  .acc-limit-bar{background:var(--s3);border-radius:4px;height:5px;margin-bottom:5px;overflow:hidden;}
+  .acc-limit-fill{height:100%;border-radius:4px;transition:width .5s;}
+  .acc-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);}
+
+  .badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+  .badge-green{background:rgba(45,214,123,.15);color:var(--green);}
+  .badge-red{background:rgba(240,79,79,.2);color:var(--red);}
+  .badge-yellow{background:rgba(245,183,49,.15);color:var(--yellow);}
+
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+  .field input,.field select,.field textarea{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:14px;padding:10px 12px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);}
+  .field textarea{resize:vertical;min-height:56px;}
+  .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7799'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .input-pfx{position:relative;}
+  .input-pfx span{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;}
+  .input-pfx input{padding-left:22px;}
+  .number-input{text-align:right;font-family:var(--mono);}
+
+  .btn{width:100%;border:none;border-radius:9px;padding:13px;font-size:14px;font-weight:700;font-family:var(--font);cursor:pointer;transition:opacity .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:0;}
+  .btn:active{transform:scale(.97);opacity:.9;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-primary{background:var(--blue);color:#fff;}
+  .btn-danger{background:rgba(240,79,79,.12);color:var(--red);border:1px solid rgba(240,79,79,.4);}
+  .btn-sm{padding:7px 13px;font-size:12px;font-weight:600;font-family:var(--font);border-radius:6px;cursor:pointer;background:var(--s3);color:var(--muted);border:1px solid var(--bd2);display:inline-flex;align-items:center;gap:5px;transition:all .2s;}
+  .btn-sm:hover{border-color:var(--blue);color:var(--text);}
+
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--bd2);background:var(--s2);color:var(--muted);transition:all .2s;flex:1;text-align:center;min-width:60px;}
+  .chip.sel-green{background:rgba(45,214,123,.12);color:var(--green);border-color:rgba(45,214,123,.4);}
+  .chip.sel-red{background:rgba(240,79,79,.12);color:var(--red);border-color:rgba(240,79,79,.4);}
+  .chip.sel-yellow{background:rgba(245,183,49,.12);color:var(--yellow);border-color:rgba(245,183,49,.4);}
+
+  .alert{border-radius:10px;padding:13px 15px;margin-bottom:10px;display:flex;gap:11px;align-items:flex-start;}
+  .alert-freeze{background:rgba(240,79,79,.1);border:1px solid rgba(240,79,79,.35);}
+  .alert-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+  .alert-title{font-weight:700;font-size:13px;margin-bottom:2px;}
+  .alert-sub{font-size:11px;color:var(--muted);line-height:1.5;}
+
+  .hist-item{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:11px 13px;margin-bottom:8px;}
+  .hist-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+  .hist-name{font-weight:600;font-size:13px;}
+  .hist-time{font-family:var(--mono);font-size:10px;color:var(--muted);}
+  .hist-detail{font-size:12px;color:var(--muted);line-height:1.5;}
+  .hist-amount{font-family:var(--mono);font-weight:600;font-size:14px;margin-top:4px;}
+
+  .diff-display{background:var(--s2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;font-family:var(--mono);font-size:18px;font-weight:600;color:var(--muted);}
+
+  .sec-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+  .divider{border:none;border-top:1px solid var(--bd);margin:14px 0;}
+  .hint{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.6;}
+  .hint a{color:var(--blue);text-decoration:none;}
+  .empty{text-align:center;padding:32px 16px;color:var(--muted);}
+  .empty-icon{font-size:28px;margin-bottom:8px;}
+
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;align-items:flex-end;justify-content:center;}
+  .modal-bg.open{display:flex;}
+  .modal{background:var(--s1);border:1px solid var(--bd);border-radius:16px 16px 0 0;padding:20px 16px 32px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;}
+  .modal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .modal-title{font-weight:700;font-size:15px;}
+  .modal-close{background:var(--s3);border:none;color:var(--muted);border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;line-height:28px;text-align:center;}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--s2);border:1px solid var(--bd2);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;z-index:999;transition:transform .3s;white-space:nowrap;display:flex;align-items:center;gap:8px;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .toast.ok{border-color:rgba(45,214,123,.4);color:var(--green);}
+  .toast.err{border-color:rgba(240,79,79,.4);color:var(--red);}
+  .toast.warn{border-color:rgba(245,183,49,.4);color:var(--yellow);}
+
+  .spinner{width:18px;height:18px;border:2px solid var(--bd2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .online-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+  .online-chip{font-size:11px;background:var(--s2);border:1px solid var(--bd);border-radius:20px;padding:4px 10px;color:var(--muted);display:flex;align-items:center;gap:5px;}
+  .online-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+
+  .cfg-box{background:rgba(74,143,255,.08);border:1px solid rgba(74,143,255,.25);border-radius:10px;padding:14px;font-size:12px;line-height:1.8;color:var(--muted);font-family:var(--mono);}
+  .cfg-box b{color:var(--text);}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     SETUP SCREEN
+═══════════════════════════════════════ -->
+<div id="setup-screen">
+  <div class="setup-logo">🏦</div>
+  <div class="setup-title">FinWatch</div>
+  <div class="setup-sub">ระบบติดตามบัญชีทีม • Real-time sync<br>ตั้งค่าครั้งเดียว ทุกคนในทีมใช้ได้เลย</div>
+
+  <div class="setup-card">
+    <div class="setup-step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">สร้าง Firebase Project (ฟรี)</div>
+        <div class="step-desc">
+          ไปที่ <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a>
+          → Add project → ตั้งชื่อ → ปิด Analytics → Create project<br><br>
+          จากนั้น: Build → <b>Realtime Database</b> → Create database → เลือก region → Start in <b>test mode</b>
+        </div>
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">คัดลอก Database URL</div>
+        <div class="step-desc">
+          จะเห็น URL ในรูปแบบ:<br>
+          <code style="color:var(--cyan)">https://your-project-default-rtdb.firebaseio.com</code>
+        </div>
+        <input class="step-input" id="cfg-url" placeholder="https://your-project-default-rtdb.firebaseio.com" oninput="validateSetup()">
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">ตั้งชื่อทีมและ Telegram</div>
+        <div class="step-desc">ชื่อทีม (แสดงใน Telegram)</div>
+        <input class="step-input" id="cfg-team" placeholder="เช่น Finance Team" oninput="validateSetup()">
+        <div class="step-desc" style="margin-top:10px">Telegram Bot Token (ไม่บังคับ)</div>
+        <input class="step-input" id="cfg-token" placeholder="1234567890:ABCdef...">
+        <div class="step-desc" style="margin-top:8px">Telegram Chat/Group ID (ไม่บังคับ)</div>
+        <input class="step-input" id="cfg-chatid" placeholder="-1001234567890">
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">ชื่อของคุณ</div>
+        <div class="step-desc">ใช้แสดงในรายงาน</div>
+        <input class="step-input" id="cfg-myname" placeholder="ชื่อ-นามสกุล" oninput="validateSetup()">
+      </div>
+    </div>
+  </div>
+
+  <div class="setup-err" id="setup-err"></div>
+  <button class="btn-setup" id="btn-start" onclick="startApp()" disabled>🚀 เริ่มใช้งาน</button>
+  <div style="font-size:11px;color:var(--muted);margin-top:12px;text-align:center;">แชร์ URL ไฟล์นี้ + config เดียวกันให้ทีม ทุกคนจะ sync กัน</div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════ -->
+<div id="app">
+  <div class="topbar">
+    <div class="logo">
+      <div class="live-dot" id="live-dot" style="background:var(--yellow)"></div>
+      FinWatch
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="sync-badge sync-off" id="sync-badge">เชื่อมต่อ...</span>
+      <span class="clock" id="clock">--:--</span>
+    </div>
+  </div>
+
+  <div class="nav">
+    <div class="nav-item active" onclick="goPage('dashboard')"><span class="nav-icon">📊</span>ภาพรวม</div>
+    <div class="nav-item" onclick="goPage('accounts')"><span class="nav-icon">🏦</span>บัญชี</div>
+    <div class="nav-item" onclick="goPage('eod')"><span class="nav-icon">📋</span>ตัดยอด</div>
+    <div class="nav-item" onclick="goPage('alert')"><span class="nav-icon">🚨</span>อายัด</div>
+    <div class="nav-item" onclick="goPage('settings')"><span class="nav-icon">⚙️</span>ตั้งค่า</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-val" id="d-count" style="color:var(--blue)">—</div><div class="stat-lbl">บัญชีที่ใช้งาน</div></div>
+      <div class="stat"><div class="stat-val" id="d-total" style="color:var(--green)">—</div><div class="stat-lbl">ยอดรวมทุกบัญชี</div></div>
+      <div class="stat"><div class="stat-val" id="d-frozen" style="color:var(--red)">—</div><div class="stat-lbl">บัญชีถูกอายัด</div></div>
+      <div class="stat"><div class="stat-val" id="d-diff" style="color:var(--yellow)">—</div><div class="stat-lbl">ขาด/เกินสุทธิ</div></div>
+    </div>
+    <div id="d-freeze-alerts"></div>
+    <div class="card-title">ออนไลน์ในทีม</div>
+    <div class="online-row" id="online-row"><div style="font-size:12px;color:var(--muted)">กำลังโหลด...</div></div>
+    <div class="card-title" style="margin-top:4px">บัญชีทั้งหมด</div>
+    <div id="d-acc-list"><div class="empty"><div class="empty-icon">🏦</div>ยังไม่มีบัญชี</div></div>
+    <div class="card-title" style="margin-top:14px">ตัดยอดล่าสุด</div>
+    <div id="d-eod-latest"><div class="empty"><div class="empty-icon">📋</div>ยังไม่มีข้อมูล</div></div>
+  </div>
+
+  <!-- ACCOUNTS -->
+  <div class="page" id="page-accounts">
+    <button class="btn btn-primary" onclick="openAddAcc()" style="margin-bottom:14px">➕ เพิ่มบัญชีใหม่</button>
+    <div id="acc-full"><div class="empty"><div class="empty-icon">🏦</div>ยังไม่มีบัญชี</div></div>
+  </div>
+
+  <!-- EOD -->
+  <div class="page" id="page-eod">
+    <div class="card">
+      <div class="card-title">บันทึกตัดยอดสิ้นวัน</div>
+      <div class="field"><label>บัญชีที่ตัดยอด</label><select id="eod-acc"><option value="">— เลือกบัญชี —</option></select></div>
+      <div class="field-row">
+        <div class="field"><label>ยอดคงเหลือจริง (฿)</label><div class="input-pfx"><span>฿</span><input type="number" class="number-input" id="eod-bal" placeholder="0.00" oninput="calcDiff()"></div></div>
+        <div class="field"><label>ยอดตามระบบ (฿)</label><div class="input-pfx"><span>฿</span><input type="number" class="number-input" id="eod-sys" placeholder="0.00" oninput="calcDiff()"></div></div>
+      </div>
+      <div class="field"><label>ยอดขาด / เกิน</label><div class="diff-display" id="diff-show">— กรอกยอดก่อน</div></div>
+      <div class="field"><label>สถานะ</label>
+        <div class="chip-row">
+          <div class="chip" id="ec-ok" onclick="pickEOD('ตรงกัน',this,'sel-green')">✅ ตรงกัน</div>
+          <div class="chip" id="ec-sh" onclick="pickEOD('ยอดขาด',this,'sel-red')">❌ ยอดขาด</div>
+          <div class="chip" id="ec-ov" onclick="pickEOD('ยอดเกิน',this,'sel-yellow')">⚠️ ยอดเกิน</div>
+        </div>
+      </div>
+      <div class="field"><label>หมายเหตุ</label><textarea id="eod-note" placeholder="สาเหตุที่ยอดไม่ตรง..."></textarea></div>
+      <button class="btn btn-primary" id="eod-btn" onclick="submitEOD()">📤 บันทึกและส่งรายงาน</button>
+    </div>
+    <div class="sec-label" style="margin-top:14px">ประวัติตัดยอด</div>
+    <div id="eod-hist"><div class="empty"><div class="empty-icon">📋</div>ยังไม่มีข้อมูล</div></div>
+  </div>
+
+  <!-- ALERT -->
+  <div class="page" id="page-alert">
+    <div class="card" style="border-color:rgba(240,79,79,.4)">
+      <div class="card-title" style="color:var(--red)">🚨 แจ้งบัญชีถูกอายัด</div>
+      <div class="field"><label>บัญชีที่ถูกอายัด</label><select id="alr-acc"><option value="">— เลือกบัญชี —</option></select></div>
+      <div class="field"><label>วงเงินที่อายัด (฿) — ถ้าทราบ</label><div class="input-pfx"><span>฿</span><input type="number" class="number-input" id="alr-amt" placeholder="0"></div></div>
+      <div class="field"><label>แหล่งที่มา / เจ้าหน้าที่</label><input type="text" id="alr-src" placeholder="เช่น ธนาคาร, ศาล, DSI"></div>
+      <div class="field"><label>รายละเอียด</label><textarea id="alr-detail" placeholder="อธิบายสถานการณ์ เอกสารที่ได้รับ..."></textarea></div>
+      <button class="btn btn-danger" id="alr-btn" onclick="submitAlert()">🚨 แจ้งทีมและส่ง Telegram ทันที</button>
+    </div>
+    <div class="sec-label" style="margin-top:14px">ประวัติการอายัด</div>
+    <div id="alr-hist"><div class="empty"><div class="empty-icon">🔒</div>ไม่มีประวัติ</div></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="card">
+      <div class="card-title">การเชื่อมต่อปัจจุบัน</div>
+      <div class="cfg-box" id="cfg-display"></div>
+      <div style="margin-top:10px;display:flex;gap:8px;">
+        <button class="btn-sm" onclick="testTG()" style="flex:1">🔔 ทดสอบ Telegram</button>
+        <button class="btn-sm" onclick="resetSetup()" style="flex:1;color:var(--red);border-color:rgba(240,79,79,.3)">🔄 เปลี่ยน Config</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">อัปเดตชื่อและ Telegram</div>
+      <div class="field"><label>ชื่อของคุณ</label><input type="text" id="s-myname" placeholder="ชื่อ-นามสกุล"></div>
+      <div class="field"><label>Telegram Bot Token</label><input type="text" id="s-token" placeholder="1234567890:ABCdef..."></div>
+      <div class="field"><label>Telegram Chat ID</label><input type="text" id="s-chatid" placeholder="-1001234567890"></div>
+      <button class="btn btn-primary" onclick="saveLocalSettings()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ADD ACCOUNT -->
+<div class="modal-bg" id="modal-acc">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title">เพิ่มบัญชีใหม่</div>
+      <button class="modal-close" onclick="closeModal('modal-acc')">✕</button>
+    </div>
+    <div class="field"><label>ชื่อบัญชี / เจ้าของ</label><input type="text" id="m-name" placeholder="เช่น นาย สมชาย"></div>
+    <div class="field"><label>ธนาคาร</label>
+      <select id="m-bank">
+        <option value="">— เลือก —</option>
+        <option>กสิกรไทย (KBANK)</option><option>ไทยพาณิชย์ (SCB)</option>
+        <option>กรุงไทย (KTB)</option><option>กรุงเทพ (BBL)</option>
+        <option>ทหารไทยธนชาต (TTB)</option><option>ธนาคารออมสิน</option>
+        <option>ธ.ก.ส.</option><option>อื่นๆ</option>
+      </select>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>เลขท้าย 4 หลัก</label><input type="text" id="m-num" maxlength="4" placeholder="xxxx" style="font-family:var(--mono)"></div>
+      <div class="field"><label>วงเงินสูงสุด (฿)</label><div class="input-pfx"><span>฿</span><input type="number" class="number-input" id="m-limit" placeholder="0"></div></div>
+    </div>
+    <div class="field"><label>ยอดคงเหลือปัจจุบัน (฿)</label><div class="input-pfx"><span>฿</span><input type="number" class="number-input" id="m-balance" placeholder="0"></div></div>
+    <button class="btn btn-primary" onclick="saveAccount()">💾 บันทึก</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// CONFIG & STATE
+// ══════════════════════════════════════════
+let cfg = JSON.parse(localStorage.getItem('fw_cfg') || 'null');
+let localSettings = JSON.parse(localStorage.getItem('fw_local') || '{}');
+
+// Firebase REST base
+let DB = '';
+
+// In-memory state (populated by Firebase listeners)
+let accounts = {};
+let eodLogs = {};
+let alertLogs = {};
+let presence = {};
+
+let selEODStatus = '';
+let unsubFns = [];
+
+// ══════════════════════════════════════════
+// SETUP
+// ══════════════════════════════════════════
+function validateSetup() {
+  const url = document.getElementById('cfg-url').value.trim();
+  const name = document.getElementById('cfg-myname').value.trim();
+  const team = document.getElementById('cfg-team').value.trim();
+  const ok = url.includes('firebaseio.com') && name && team;
+  document.getElementById('btn-start').disabled = !ok;
+  document.getElementById('setup-err').textContent = '';
+}
+
+async function startApp() {
+  const url = document.getElementById('cfg-url').value.trim().replace(/\/$/, '');
+  const team = document.getElementById('cfg-team').value.trim();
+  const myname = document.getElementById('cfg-myname').value.trim();
+  const token = document.getElementById('cfg-token').value.trim();
+  const chatid = document.getElementById('cfg-chatid').value.trim();
+
+  document.getElementById('btn-start').disabled = true;
+  document.getElementById('btn-start').textContent = 'กำลังเชื่อมต่อ...';
+
+  // Test connection
+  try {
+    const r = await fetch(url + '/.json?shallow=true');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+  } catch(e) {
+    document.getElementById('setup-err').textContent = '❌ เชื่อมต่อ Firebase ไม่ได้ ตรวจสอบ URL และ Rules อีกครั้ง';
+    document.getElementById('btn-start').disabled = false;
+    document.getElementById('btn-start').textContent = '🚀 เริ่มใช้งาน';
+    return;
+  }
+
+  cfg = { url, team, token, chatid };
+  localStorage.setItem('fw_cfg', JSON.stringify(cfg));
+  localSettings = { myname };
+  localStorage.setItem('fw_local', JSON.stringify(localSettings));
+  DB = url;
+  launchApp();
+}
+
+function resetSetup() {
+  if (!confirm('รีเซ็ต config?')) return;
+  unsubFns.forEach(fn => fn());
+  localStorage.removeItem('fw_cfg');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('setup-screen').style.display = 'flex';
+}
+
+// ══════════════════════════════════════════
+// APP LAUNCH
+// ══════════════════════════════════════════
+function launchApp() {
+  if (!cfg) return;
+  DB = cfg.url;
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  // Fill settings page
+  document.getElementById('s-myname').value = localSettings.myname || '';
+  document.getElementById('s-token').value = cfg.token || '';
+  document.getElementById('s-chatid').value = cfg.chatid || '';
+  document.getElementById('cfg-display').innerHTML =
+    `<b>Database:</b> ${DB}<br><b>ทีม:</b> ${cfg.team}<br><b>ผู้ใช้:</b> ${localSettings.myname || '—'}<br><b>Telegram:</b> ${cfg.token ? '✅ ตั้งค่าแล้ว' : '❌ ยังไม่ได้ตั้งค่า'}`;
+
+  // Clock
+  setInterval(() => {
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', hour12: false });
+  }, 1000);
+
+  // Start Firebase listeners
+  startListeners();
+
+  // Presence: write my online status
+  setPresence(true);
+  window.addEventListener('beforeunload', () => setPresence(false));
+  setInterval(() => setPresence(true), 30000);
+}
+
+// ══════════════════════════════════════════
+// FIREBASE REST (SSE Streaming)
+// ══════════════════════════════════════════
+function fbUrl(path) { return DB + '/' + path + '.json'; }
+
+async function fbSet(path, data) {
+  await fetch(fbUrl(path), { method: 'PUT', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json' } });
+}
+async function fbPush(path, data) {
+  const r = await fetch(fbUrl(path), { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json' } });
+  return r.json();
+}
+async function fbDelete(path) {
+  await fetch(fbUrl(path), { method: 'DELETE' });
+}
+
+function fbListen(path, cb) {
+  const url = DB + '/' + path + '.json';
+  const es = new EventSource(url);
+  es.addEventListener('put', e => { const d = JSON.parse(e.data); cb(d.data); });
+  es.addEventListener('patch', e => { const d = JSON.parse(e.data); cb(d.data); });
+  es.onerror = () => setSyncStatus(false);
+  es.onopen = () => setSyncStatus(true);
+  return () => es.close();
+}
+
+function setSyncStatus(ok) {
+  const dot = document.getElementById('live-dot');
+  const badge = document.getElementById('sync-badge');
+  dot.style.background = ok ? 'var(--green)' : 'var(--red)';
+  dot.style.boxShadow = ok ? '0 0 6px var(--green)' : '0 0 6px var(--red)';
+  badge.textContent = ok ? '● LIVE' : '● ออฟไลน์';
+  badge.className = 'sync-badge ' + (ok ? 'sync-ok' : 'sync-off');
+}
+
+function startListeners() {
+  unsubFns.push(fbListen('accounts', data => {
+    accounts = data || {};
+    renderAll();
+  }));
+  unsubFns.push(fbListen('eod', data => {
+    eodLogs = data || {};
+    renderAll();
+  }));
+  unsubFns.push(fbListen('alerts', data => {
+    alertLogs = data || {};
+    renderAll();
+  }));
+  unsubFns.push(fbListen('presence', data => {
+    presence = data || {};
+    renderOnline();
+  }));
+}
+
+async function setPresence(online) {
+  const name = localSettings.myname || 'ไม่ระบุ';
+  const key = name.replace(/[^a-zA-Z0-9ก-๙]/g, '_');
+  if (online) {
+    await fbSet('presence/' + key, { name, online: true, t: Date.now() });
+  } else {
+    await fbSet('presence/' + key, { name, online: false, t: Date.now() });
+  }
+}
+
+// ══════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════
+function fmt(n) {
+  if (n === undefined || n === null || n === '') return '฿0';
+  return '฿' + Number(n).toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+}
+function fmtDiff(n) {
+  if (n === 0) return { txt: '฿0 ✅ ตรงกัน', color: 'var(--green)' };
+  if (n > 0) return { txt: '+' + fmt(n) + ' ⚠️ เกิน', color: 'var(--yellow)' };
+  return { txt: fmt(n) + ' ❌ ขาด', color: 'var(--red)' };
+}
+function ts() {
+  return new Date().toLocaleString('th-TH', { day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+function renderAll() {
+  renderDashboard();
+  renderAccountsFull();
+  renderEODHist();
+  renderAlertHist();
+  populateSel();
+}
+
+function renderDashboard() {
+  const accArr = Object.values(accounts);
+  const active = accArr.filter(a => !a.frozen).length;
+  const frozen = accArr.filter(a => a.frozen).length;
+  const total = accArr.reduce((s, a) => s + (Number(a.balance) || 0), 0);
+  const eodArr = Object.values(eodLogs);
+  const totalDiff = eodArr.slice(-10).reduce((s, e) => s + (Number(e.diff) || 0), 0);
+
+  document.getElementById('d-count').textContent = active;
+  document.getElementById('d-total').textContent = fmt(total);
+  document.getElementById('d-frozen').textContent = frozen;
+  const d = fmtDiff(totalDiff);
+  document.getElementById('d-diff').textContent = totalDiff === 0 ? '฿0' : (totalDiff > 0 ? '+' + fmt(Math.abs(totalDiff)) : fmt(totalDiff));
+  document.getElementById('d-diff').style.color = d.color;
+
+  // Freeze alerts
+  const fa = document.getElementById('d-freeze-alerts');
+  const frozenAccs = accArr.filter(a => a.frozen);
+  fa.innerHTML = frozenAccs.map(a => `
+    <div class="alert alert-freeze">
+      <div class="alert-icon">🔒</div>
+      <div>
+        <div class="alert-title" style="color:var(--red)">${a.name} — ถูกอายัด</div>
+        <div class="alert-sub">${a.bank} · ****${a.num || '****'}</div>
+      </div>
+    </div>`).join('');
+
+  // Account mini list
+  const al = document.getElementById('d-acc-list');
+  al.innerHTML = accArr.length
+    ? accArr.map(a => accCard(a, true)).join('')
+    : '<div class="empty"><div class="empty-icon">🏦</div>ยังไม่มีบัญชี</div>';
+
+  // EOD latest 3
+  const el = document.getElementById('d-eod-latest');
+  const eodSorted = Object.entries(eodLogs).sort((a,b) => b[1].createdAt - a[1].createdAt).slice(0,3);
+  el.innerHTML = eodSorted.length
+    ? eodSorted.map(([,e]) => eodCard(e)).join('')
+    : '<div class="empty"><div class="empty-icon">📋</div>ยังไม่มีข้อมูล</div>';
+}
+
+function renderOnline() {
+  const row = document.getElementById('online-row');
+  const online = Object.values(presence).filter(p => p.online && (Date.now() - p.t < 60000));
+  row.innerHTML = online.length
+    ? online.map(p => `<div class="online-chip"><div class="online-dot"></div>${p.name}</div>`).join('')
+    : '<div style="font-size:12px;color:var(--muted)">ไม่มีใครออนไลน์ขณะนี้</div>';
+}
+
+function accCard(a, mini) {
+  const pct = a.limit ? Math.min(100, (a.balance / a.limit) * 100) : 0;
+  const barColor = pct > 80 ? 'var(--red)' : pct > 50 ? 'var(--yellow)' : 'var(--green)';
+  const badge = a.frozen
+    ? '<span class="badge badge-red">🔒 อายัด</span>'
+    : '<span class="badge badge-green">● ปกติ</span>';
+  const btns = mini ? '' : `
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn-sm" onclick="updateBalance('${a.id}')" style="flex:1">✏️ อัปเดตยอด</button>
+      ${a.frozen
+        ? `<button class="btn-sm" onclick="toggleFreeze('${a.id}',false)" style="flex:1;color:var(--green)">🔓 ปลดอายัด</button>`
+        : `<button class="btn-sm" onclick="quickFreeze('${a.id}')" style="flex:1;color:var(--red);border-color:rgba(240,79,79,.3)">🔒 แจ้งอายัด</button>`
+      }
+      <button class="btn-sm" onclick="deleteAccount('${a.id}')" style="color:var(--red);border-color:rgba(240,79,79,.3)">🗑️</button>
+    </div>`;
+  return `
+    <div class="acc-item${a.frozen ? ' frozen' : ''}">
+      <div class="acc-top"><div><div class="acc-name">${a.name}</div><div class="acc-num">${a.bank}${a.num ? ' · ****' + a.num : ''}</div></div>${badge}</div>
+      <div class="acc-balance">${fmt(a.balance)}</div>
+      ${a.limit ? `<div class="acc-limit-bar"><div class="acc-limit-fill" style="width:${pct.toFixed(1)}%;background:${barColor}"></div></div><div class="acc-meta"><span>ใช้ ${pct.toFixed(0)}%</span><span>วงเงิน ${fmt(a.limit)}</span></div>` : ''}
+      ${btns}
+    </div>`;
+}
+
+function renderAccountsFull() {
+  const el = document.getElementById('acc-full');
+  const arr = Object.values(accounts);
+  el.innerHTML = arr.length
+    ? arr.map(a => accCard(a, false)).join('')
+    : '<div class="empty"><div class="empty-icon">🏦</div>ยังไม่มีบัญชี</div>';
+}
+
+function eodCard(e) {
+  const d = fmtDiff(e.diff || 0);
+  const cls = e.status === 'ตรงกัน' ? 'badge-green' : e.status === 'ยอดขาด' ? 'badge-red' : 'badge-yellow';
+  return `<div class="hist-item">
+    <div class="hist-top"><span class="hist-name">${e.accName}</span><span class="badge ${cls}">${e.status}</span></div>
+    <div class="hist-detail">${e.accBank} · ${e.reporter}${e.note ? ' · ' + e.note : ''}</div>
+    <div class="hist-amount" style="color:${d.color}">${d.txt}</div>
+    <div class="hist-time" style="margin-top:3px">${e.time}</div>
+  </div>`;
+}
+
+function renderEODHist() {
+  const el = document.getElementById('eod-hist');
+  const sorted = Object.values(eodLogs).sort((a,b) => b.createdAt - a.createdAt);
+  el.innerHTML = sorted.length
+    ? sorted.slice(0, 30).map(eodCard).join('')
+    : '<div class="empty"><div class="empty-icon">📋</div>ยังไม่มีข้อมูล</div>';
+}
+
+function renderAlertHist() {
+  const el = document.getElementById('alr-hist');
+  const sorted = Object.values(alertLogs).sort((a,b) => b.createdAt - a.createdAt);
+  el.innerHTML = sorted.length
+    ? sorted.map(a => `
+      <div class="hist-item" style="border-color:rgba(240,79,79,.3)">
+        <div class="hist-top"><span class="hist-name" style="color:var(--red)">🔒 ${a.accName}</span><span class="badge badge-red">อายัด</span></div>
+        <div class="hist-detail">${a.accBank}${a.source ? ' · ' + a.source : ''}</div>
+        ${a.amount > 0 ? `<div class="hist-amount" style="color:var(--red)">${fmt(a.amount)}</div>` : ''}
+        ${a.detail ? `<div class="hist-detail" style="margin-top:4px">${a.detail}</div>` : ''}
+        <div class="hist-detail" style="margin-top:3px">ผู้แจ้ง: ${a.reporter}</div>
+        <div class="hist-time" style="margin-top:3px">${a.time}</div>
+      </div>`).join('')
+    : '<div class="empty"><div class="empty-icon">🔒</div>ไม่มีประวัติ</div>';
+}
+
+function populateSel() {
+  const opts = Object.values(accounts).map(a => `<option value="${a.id}">${a.name} — ${a.bank}${a.num ? ' ****' + a.num : ''}</option>`).join('');
+  const empty = '<option value="">— เลือกบัญชี —</option>';
+  document.getElementById('eod-acc').innerHTML = empty + opts;
+  document.getElementById('alr-acc').innerHTML = empty + opts;
+}
+
+// ══════════════════════════════════════════
+// ACCOUNTS CRUD
+// ══════════════════════════════════════════
+function openAddAcc() { document.getElementById('modal-acc').classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+async function saveAccount() {
+  const name = document.getElementById('m-name').value.trim();
+  const bank = document.getElementById('m-bank').value;
+  if (!name || !bank) return showToast('กรอกชื่อและธนาคาร', 'err');
+  const id = 'acc_' + Date.now();
+  const acc = {
+    id, name, bank,
+    num: document.getElementById('m-num').value.trim(),
+    balance: parseFloat(document.getElementById('m-balance').value) || 0,
+    limit: parseFloat(document.getElementById('m-limit').value) || 0,
+    frozen: false, createdAt: Date.now()
+  };
+  await fbSet('accounts/' + id, acc);
+  closeModal('modal-acc');
+  ['m-name','m-bank','m-num','m-balance','m-limit'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  showToast('✅ เพิ่มบัญชีแล้ว', 'ok');
+}
+
+async function deleteAccount(id) {
+  if (!confirm('ลบบัญชีนี้?')) return;
+  await fbDelete('accounts/' + id);
+  showToast('🗑️ ลบแล้ว', '');
+}
+
+async function toggleFreeze(id, freeze) {
+  await fbSet('accounts/' + id + '/frozen', freeze);
+}
+
+function quickFreeze(id) {
+  goPage('alert');
+  setTimeout(() => { document.getElementById('alr-acc').value = id; }, 200);
+}
+
+async function updateBalance(id) {
+  const acc = accounts[id];
+  if (!acc) return;
+  const val = prompt(`อัปเดตยอดคงเหลือของ ${acc.name}\nยอดปัจจุบัน: ${fmt(acc.balance)}\n\nกรอกยอดใหม่:`);
+  if (val === null) return;
+  const n = parseFloat(val);
+  if (isNaN(n)) return showToast('ตัวเลขไม่ถูกต้อง', 'err');
+  await fbSet('accounts/' + id + '/balance', n);
+  showToast('✅ อัปเดตยอดแล้ว', 'ok');
+}
+
+// ══════════════════════════════════════════
+// EOD
+// ══════════════════════════════════════════
+function pickEOD(val, el, cls) {
+  selEODStatus = val;
+  document.querySelectorAll('#page-eod .chip').forEach(c => c.className = 'chip');
+  el.classList.add(cls);
+}
+
+function calcDiff() {
+  const bal = parseFloat(document.getElementById('eod-bal').value);
+  const sys = parseFloat(document.getElementById('eod-sys').value);
+  const el = document.getElementById('diff-show');
+  if (isNaN(bal) || isNaN(sys)) { el.textContent = '— กรอกยอดก่อน'; el.style.color = 'var(--muted)'; return; }
+  const diff = bal - sys;
+  const d = fmtDiff(diff);
+  el.textContent = d.txt; el.style.color = d.color;
+  if (diff === 0) document.getElementById('ec-ok').click();
+  else if (diff < 0) document.getElementById('ec-sh').click();
+  else document.getElementById('ec-ov').click();
+}
+
+async function submitEOD() {
+  const accId = document.getElementById('eod-acc').value;
+  const bal = document.getElementById('eod-bal').value;
+  const sys = document.getElementById('eod-sys').value;
+  const note = document.getElementById('eod-note').value.trim();
+  const reporter = localSettings.myname || 'ไม่ระบุ';
+  if (!accId) return showToast('เลือกบัญชีก่อน', 'err');
+  if (!bal || !sys) return showToast('กรอกยอดให้ครบ', 'err');
+  if (!selEODStatus) return showToast('เลือกสถานะ', 'err');
+
+  const acc = accounts[accId];
+  const b = parseFloat(bal), s = parseFloat(sys), diff = b - s;
+
+  const btn = document.getElementById('eod-btn');
+  btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
+
+  const log = {
+    accId, accName: acc ? acc.name : '', accBank: acc ? acc.bank : '',
+    balance: b, system: s, diff, status: selEODStatus, note, reporter,
+    time: ts(), createdAt: Date.now()
+  };
+
+  // Update account balance in Firebase
+  if (acc) await fbSet('accounts/' + accId + '/balance', b);
+  await fbPush('eod', log);
+  if (cfg.token && cfg.chatid) await sendEODTG(log);
+
+  showToast('✅ บันทึกตัดยอดแล้ว', 'ok');
+  document.getElementById('eod-bal').value = '';
+  document.getElementById('eod-sys').value = '';
+  document.getElementById('eod-note').value = '';
+  document.getElementById('diff-show').textContent = '— กรอกยอดก่อน';
+  document.getElementById('diff-show').style.color = 'var(--muted)';
+  document.querySelectorAll('#page-eod .chip').forEach(c => c.className = 'chip');
+  selEODStatus = '';
+  btn.disabled = false; btn.innerHTML = '📤 บันทึกและส่งรายงาน';
+}
+
+// ══════════════════════════════════════════
+// ALERT
+// ══════════════════════════════════════════
+async function submitAlert() {
+  const accId = document.getElementById('alr-acc').value;
+  const amt = parseFloat(document.getElementById('alr-amt').value) || 0;
+  const source = document.getElementById('alr-src').value.trim();
+  const detail = document.getElementById('alr-detail').value.trim();
+  const reporter = localSettings.myname || 'ไม่ระบุ';
+  if (!accId) return showToast('เลือกบัญชีก่อน', 'err');
+
+  const acc = accounts[accId];
+  const btn = document.getElementById('alr-btn');
+  btn.disabled = true; btn.textContent = '🚨 กำลังส่ง...';
+
+  // Mark account as frozen in Firebase
+  await fbSet('accounts/' + accId + '/frozen', true);
+
+  const log = {
+    accId, accName: acc ? acc.name : '', accBank: acc ? acc.bank : '',
+    amount: amt, source, detail, reporter, time: ts(), createdAt: Date.now()
+  };
+  await fbPush('alerts', log);
+  if (cfg.token && cfg.chatid) await sendFreezeTG(log);
+
+  showToast('🚨 แจ้งทีมแล้ว!', 'warn');
+  ['alr-amt','alr-src','alr-detail'].forEach(id => { document.getElementById(id).value = ''; });
+  btn.disabled = false; btn.textContent = '🚨 แจ้งทีมและส่ง Telegram ทันที';
+}
+
+// ══════════════════════════════════════════
+// TELEGRAM
+// ══════════════════════════════════════════
+async function sendEODTG(log) {
+  const team = cfg.team || 'FinWatch';
+  const diffStr = log.diff === 0 ? '฿0 ✅ ตรงกัน' : log.diff > 0 ? `+${fmt(log.diff)} ⚠️ เกิน` : `${fmt(log.diff)} ❌ ขาด`;
+  const msg = `📊 *ตัดยอดสิ้นวัน — ${team}*\n\n🏦 *บัญชี:* ${log.accName}\n🏛 *ธนาคาร:* ${log.accBank}\n💰 *ยอดจริง:* ${fmt(log.balance)}\n📋 *ยอดระบบ:* ${fmt(log.system)}\n📉 *ขาด/เกิน:* ${diffStr}${log.note ? `\n💬 *หมายเหตุ:* ${log.note}` : ''}\n👤 *ผู้รายงาน:* ${log.reporter}\n🕐 ${log.time}`;
+  try { await fetch(`https://api.telegram.org/bot${cfg.token}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ chat_id: cfg.chatid, text: msg, parse_mode: 'Markdown' }) }); } catch(e) {}
+}
+
+async function sendFreezeTG(log) {
+  const team = cfg.team || 'FinWatch';
+  const amtStr = log.amount > 0 ? `\n💰 *วงเงินอายัด:* ${fmt(log.amount)}` : '';
+  const msg = `🚨🚨🚨 *แจ้งด่วน — บัญชีถูกอายัด!*\n*ทีม: ${team}*\n\n🏦 *บัญชี:* ${log.accName}\n🏛 *ธนาคาร:* ${log.accBank}${amtStr}${log.source ? `\n📌 *แหล่งที่มา:* ${log.source}` : ''}${log.detail ? `\n📝 *รายละเอียด:* ${log.detail}` : ''}\n👤 *ผู้แจ้ง:* ${log.reporter}\n🕐 ${log.time}\n\n⚠️ กรุณาดำเนินการทันที!`;
+  try { await fetch(`https://api.telegram.org/bot${cfg.token}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ chat_id: cfg.chatid, text: msg, parse_mode: 'Markdown' }) }); } catch(e) {}
+}
+
+async function testTG() {
+  if (!cfg.token || !cfg.chatid) return showToast('ยังไม่ได้ตั้งค่า Telegram', 'err');
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${cfg.token}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ chat_id: cfg.chatid, text: `✅ FinWatch เชื่อมต่อ Telegram สำเร็จ!\nทีม: ${cfg.team}` }) });
+    const d = await r.json();
+    d.ok ? showToast('✅ Telegram ใช้งานได้!', 'ok') : showToast('❌ ' + d.description, 'err');
+  } catch(e) { showToast('❌ เชื่อมต่อไม่ได้', 'err'); }
+}
+
+// ══════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════
+function saveLocalSettings() {
+  localSettings.myname = document.getElementById('s-myname').value.trim();
+  cfg.token = document.getElementById('s-token').value.trim();
+  cfg.chatid = document.getElementById('s-chatid').value.trim();
+  localStorage.setItem('fw_local', JSON.stringify(localSettings));
+  localStorage.setItem('fw_cfg', JSON.stringify(cfg));
+  document.getElementById('cfg-display').innerHTML =
+    `<b>Database:</b> ${DB}<br><b>ทีม:</b> ${cfg.team}<br><b>ผู้ใช้:</b> ${localSettings.myname || '—'}<br><b>Telegram:</b> ${cfg.token ? '✅ ตั้งค่าแล้ว' : '❌ ยังไม่ได้ตั้งค่า'}`;
+  setPresence(true);
+  showToast('✅ บันทึกแล้ว', 'ok');
+}
+
+// ══════════════════════════════════════════
+// NAV + UTILS
+// ══════════════════════════════════════════
+function goPage(p) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  const idx = ['dashboard','accounts','eod','alert','settings'].indexOf(p);
+  document.querySelectorAll('.nav-item')[idx].classList.add('active');
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + (type || '');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+window.addEventListener('load', () => {
+  if (cfg && cfg.url) {
+    launchApp();
+  }
+});
+</script>
+</body>
+</html>

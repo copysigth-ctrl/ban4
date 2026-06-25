@@ -847,7 +847,7 @@ function markClean(id){dirtyEdits.delete(id);}
 function renderOnline(){
   const on=Object.values(presence).filter(p=>p.online&&(Date.now()-p.t<90000));
   document.getElementById('online-row').innerHTML=on.length
-    ?on.map(p=>`<div class="online-chip"><div class="online-dot"></div>${p.name}${p.shift?' <span style="font-size:10px;color:var(--muted)">(${p.shift==='เช้า'?'☀️':'🌙'})</span>':''}</div>`).join('')
+    ?on.map(p=>{const shiftIcon=p.shift==='\u0E14\u0E36\u0E01'?'\uD83C\uDF19':'\u2600\uFE0F';const shiftTxt=p.shift?` <span style="font-size:10px;color:var(--muted)">(${shiftIcon})</span>`:'';return `<div class="online-chip"><div class="online-dot"></div>${p.name}${shiftTxt}</div>`;}).join('')
     :'<div style="font-size:12px;color:var(--muted)">ไม่มีใครออนไลน์</div>';
 }
 

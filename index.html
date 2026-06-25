@@ -373,7 +373,8 @@ function validateSetup() {
   const url = document.getElementById('cfg-url').value.trim();
   const name = document.getElementById('cfg-myname').value.trim();
   const team = document.getElementById('cfg-team').value.trim();
-  const ok = url.includes('firebaseio.com') && name && team;
+  const validUrl = url.startsWith('https://') && (url.includes('firebaseio.com') || url.includes('firebasedatabase.app'));
+  const ok = validUrl && name && team;
   document.getElementById('btn-start').disabled = !ok;
   document.getElementById('setup-err').textContent = '';
 }

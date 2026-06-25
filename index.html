@@ -470,6 +470,10 @@ function launchApp(){
   startListeners(); startClock(); startSchChecker();
   setPresence(true);
   window.addEventListener('beforeunload',()=>setPresence(false));
+  // Restore last visited page
+  const lastP=local.lastPage||'update';
+  const validPages=['update','dashboard','accounts','history','settings'];
+  if(validPages.includes(lastP)) goPage(lastP);
 }
 
 function saveName(){
@@ -541,20 +545,56 @@ function setSyncStatus(ok){
   badge.className='sync-badge '+(ok?'sync-ok':'sync-off');
 }
 
+let _renderTimer=null;
+function scheduleRender(){
+  if(_renderTimer)clearTimeout(_renderTimer);
+  _renderTimer=setTimeout(()=>{_renderTimer=null;renderAllSafe();},60);
+}
+
 function startListeners(){
   unsubFns.push(fbListen('accounts',(d,evType)=>{
     if(evType==='put'){
-      accounts=d||{};
+      // Full snapshot: only apply if we have no dirty edits open
+      if(dirtyEdits.size===0){
+        accounts=d||{};
+      } else {
+        // Merge carefully: skip fields being edited
+        const incoming=d||{};
+        Object.keys(incoming).forEach(k=>{
+          if(dirtyEdits.has(k)){
+            // Keep existing account data, only update non-balance fields from remote
+            accounts[k]={...(accounts[k]||{}), ...incoming[k]};
+          } else {
+            accounts[k]=incoming[k];
+          }
+        });
+        // Remove deleted accounts
+        Object.keys(accounts).forEach(k=>{if(!(k in incoming))delete accounts[k];});
+      }
     } else {
-      // patch: merge only changed keys, preserve dirty edits' account data
+      // patch event: fine-grained update
       if(d){
         Object.keys(d).forEach(k=>{
           if(d[k]===null){ delete accounts[k]; }
-          else { accounts[k]={...(accounts[k]||{}), ...d[k]}; }
+          else {
+            // If this account's panel is open, merge carefully
+            if(dirtyEdits.has(k)){
+              // Only update non-numeric display fields (name, brand, frozen, etc)
+              const safe={};
+              Object.keys(d[k]).forEach(f=>{
+                if(!['balance','limitCash','limitScan','usedCash','usedScan'].includes(f)){
+                  safe[f]=d[k][f];
+                }
+              });
+              accounts[k]={...(accounts[k]||{}), ...safe};
+            } else {
+              accounts[k]={...(accounts[k]||{}), ...d[k]};
+            }
+          }
         });
       }
     }
-    renderAllSafe();
+    scheduleRender();
   }));
   unsubFns.push(fbListen('updates',(d,evType)=>{
     if(evType==='put'){updates=d||{};}
@@ -1308,6 +1348,7 @@ function goPage(p){
   document.getElementById('page-'+p).classList.add('active');
   const pages=['update','dashboard','accounts','history','settings'];
   document.querySelectorAll('.nav-item')[pages.indexOf(p)].classList.add('active');
+  local.lastPage=p; saveLocal();
   if(p==='dashboard'){renderDashboard();renderOnline();renderDashTGGroups();}
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}

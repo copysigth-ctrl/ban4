@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>FinWatch</title>
+<title>SANJIDATA</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 :root{
@@ -183,7 +183,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-logo">🏦</div>
-  <div class="login-title">FinWatch</div>
+  <div class="login-title">SANJIDATA</div>
   <div class="login-sub">ระบบติดตามบัญชีทีม • Real-time sync</div>
   <div class="login-card">
     <div class="lf">
@@ -213,7 +213,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <!-- APP -->
 <div id="app">
   <div class="topbar">
-    <div class="logo"><div class="live-dot" id="live-dot"></div>FinWatch</div>
+    <div class="logo"><div class="live-dot" id="live-dot"></div>SANJIDATA</div>
     <div class="top-right">
       <span class="sync-badge sync-off" id="sync-badge">เชื่อมต่อ...</span>
       <span class="user-chip" id="user-chip">—</span>
@@ -745,7 +745,7 @@ async function testAllTG(){
     try{
       const r=await fetch(`https://api.telegram.org/bot${local.token}/sendMessage`,{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({chat_id:g.id,text:`✅ FinWatch ทดสอบ → กลุ่ม "${g.name}"\nทีม: ${cfg.team}`})
+        body:JSON.stringify({chat_id:g.id,text:`✅ SANJIDATA ทดสอบ → กลุ่ม "${g.name}"\nทีม: ${cfg.team}`})
       });
       if((await r.json()).ok)ok++;
     }catch(e){}

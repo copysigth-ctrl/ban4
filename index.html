@@ -183,7 +183,7 @@
           จะเห็น URL ในรูปแบบ:<br>
           <code style="color:var(--cyan)">https://your-project-default-rtdb.firebaseio.com</code>
         </div>
-        <input class="step-input" id="cfg-url" placeholder="https://your-project-default-rtdb.firebaseio.com" oninput="validateSetup()">
+        <input class="step-input" id="cfg-url" placeholder="https://your-project-default-rtdb.firebaseio.com" >
       </div>
     </div>
 
@@ -192,7 +192,7 @@
       <div class="step-body">
         <div class="step-title">ตั้งชื่อทีมและ Telegram</div>
         <div class="step-desc">ชื่อทีม (แสดงใน Telegram)</div>
-        <input class="step-input" id="cfg-team" placeholder="เช่น Finance Team" oninput="validateSetup()">
+        <input class="step-input" id="cfg-team" placeholder="เช่น Finance Team" >
         <div class="step-desc" style="margin-top:10px">Telegram Bot Token (ไม่บังคับ)</div>
         <input class="step-input" id="cfg-token" placeholder="1234567890:ABCdef...">
         <div class="step-desc" style="margin-top:8px">Telegram Chat/Group ID (ไม่บังคับ)</div>
@@ -205,13 +205,13 @@
       <div class="step-body">
         <div class="step-title">ชื่อของคุณ</div>
         <div class="step-desc">ใช้แสดงในรายงาน</div>
-        <input class="step-input" id="cfg-myname" placeholder="ชื่อ-นามสกุล" oninput="validateSetup()">
+        <input class="step-input" id="cfg-myname" placeholder="ชื่อ-นามสกุล" >
       </div>
     </div>
   </div>
 
   <div class="setup-err" id="setup-err"></div>
-  <button class="btn-setup" id="btn-start" onclick="startApp()" disabled>🚀 เริ่มใช้งาน</button>
+  <button class="btn-setup" id="btn-start" onclick="startApp()">🚀 เริ่มใช้งาน</button>
   <div style="font-size:11px;color:var(--muted);margin-top:12px;text-align:center;">แชร์ URL ไฟล์นี้ + config เดียวกันให้ทีม ทุกคนจะ sync กัน</div>
 </div>
 
@@ -389,10 +389,18 @@ async function startApp() {
   const errEl = document.getElementById('setup-err');
   const btn = document.getElementById('btn-start');
   errEl.textContent = '';
+
+  // Validate here instead of relying on oninput
+  if (!url || (!url.includes('firebaseio.com') && !url.includes('firebasedatabase.app'))) {
+    errEl.textContent = '❌ กรุณากรอก Firebase URL ให้ถูกต้อง';
+    return;
+  }
+  if (!team) { errEl.textContent = '❌ กรุณากรอกชื่อทีม'; return; }
+  if (!myname) { errEl.textContent = '❌ กรุณากรอกชื่อของคุณ'; return; }
+
   btn.disabled = true;
   btn.textContent = 'กำลังเชื่อมต่อ...';
 
-  // Test connection
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
@@ -400,11 +408,9 @@ async function startApp() {
     clearTimeout(timeout);
     if (!r.ok && r.status !== 404) throw new Error('HTTP ' + r.status);
   } catch(e) {
-    if (e.name === 'AbortError') {
-      errEl.textContent = '❌ หมดเวลา ตรวจสอบ URL และเน็ตอีกครั้ง';
-    } else {
-      errEl.textContent = '❌ เชื่อมต่อไม่ได้: ' + (e.message || 'ตรวจสอบ URL และ Rules');
-    }
+    errEl.textContent = e.name === 'AbortError'
+      ? '❌ หมดเวลา ตรวจสอบ URL และเน็ต'
+      : '❌ เชื่อมต่อไม่ได้: ' + (e.message || 'ตรวจสอบ URL และ Rules');
     btn.disabled = false;
     btn.textContent = '🚀 เริ่มใช้งาน';
     return;

@@ -641,61 +641,90 @@ function accMini(a){
 }
 
 function accFull(a){
-  const badge=a.frozen?'<span class="badge bg-red">🔒 อายัด</span>':'<span class="badge bg-green">● ปกติ</span>';
+  const id=a.id;
+  const frozen=a.frozen;
   const cashUsed=Number(a.usedCash)||0, scanUsed=Number(a.usedScan)||0;
   const cashLim=Number(a.limitCash)||0, scanLim=Number(a.limitScan)||0;
+  const cashLeft=cashLim-cashUsed, scanLeft=scanLim-scanUsed;
   const cPct=cashLim?Math.min(100,(cashUsed/cashLim)*100):0;
   const sPct=scanLim?Math.min(100,(scanUsed/scanLim)*100):0;
   const cCol=cPct>80?'var(--red)':cPct>50?'var(--yellow)':'var(--green)';
   const sCol=sPct>80?'var(--red)':sPct>50?'var(--yellow)':'var(--green)';
-  return `<div class="acc-card${a.frozen?' frozen':''}">
-    <div class="acc-top">
-      <div>
-        <div class="acc-name">${a.name||'—'}</div>
-        ${a.brand?`<div class="acc-brand">🏷 ${a.brand}</div>`:''}
-        <div class="acc-num">${a.bank||''}${a.num?' · ****'+a.num:''}</div>
-      </div>${badge}
-    </div>
-    <div class="bal-row">
-      <div class="bal-box"><div class="bal-label">💰 เงินคงเหลือในบัญชี</div><div class="bal-val" style="color:var(--green)">${fmt(a.balance)}</div></div>
-      <div class="bal-box"><div class="bal-label">📊 วงเงินบัญชีเหลือ</div><div class="bal-val" style="color:var(--blue)">${fmt(cashLim-cashUsed)}</div><div class="bal-sub">จาก ${fmt(cashLim)}</div></div>
-    </div>
-    <div class="limit-row">
-      <div class="limit-box">
-        <div class="limit-label">💳 วงเงินกด (ATM)</div>
-        <div class="limit-val">${fmt(cashLim)}</div>
-        <div class="prog-bar"><div class="prog-fill" style="width:${cPct.toFixed(1)}%;background:${cCol}"></div></div>
-        <div class="bal-sub" style="margin-top:3px">ใช้ ${fmt(cashUsed)} · เหลือ ${fmt(cashLim-cashUsed)}</div>
-      </div>
-      <div class="limit-box">
-        <div class="limit-label">📲 วงเงินสแกน (QR)</div>
-        <div class="limit-val">${fmt(scanLim)}</div>
-        <div class="prog-bar"><div class="prog-fill" style="width:${sPct.toFixed(1)}%;background:${sCol}"></div></div>
-        <div class="bal-sub" style="margin-top:3px">ใช้ ${fmt(scanUsed)} · เหลือ ${fmt(scanLim-scanUsed)}</div>
-      </div>
-    <div id="inline-edit-${a.id}" style="display:none;background:var(--s3);border-radius:10px;padding:13px;margin-top:10px;">
-      <div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">✏️ แก้ไขยอด — ${a.name||''}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-        <div><div style="font-size:10px;color:var(--muted);margin-bottom:3px">💰 เงินคงเหลือ (ปัจจุบัน ${fmt(Number(a.balance)||0)})</div><input type="number" id="ei-bal-${a.id}" placeholder="กรอกยอดใหม่" style="width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:7px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;"></div>
-        <div><div style="font-size:10px;color:var(--muted);margin-bottom:3px">💳 วงเงินกด ATM (${fmt(Number(a.limitCash)||0)})</div><input type="number" id="ei-lcash-${a.id}" placeholder="กรอกยอดใหม่" style="width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:7px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;"></div>
-        <div><div style="font-size:10px;color:var(--muted);margin-bottom:3px">📲 วงเงิน QR (${fmt(Number(a.limitScan)||0)})</div><input type="number" id="ei-lscan-${a.id}" placeholder="กรอกยอดใหม่" style="width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:7px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;"></div>
-        <div><div style="font-size:10px;color:var(--muted);margin-bottom:3px">💸 ยอดใช้ ATM แล้ว (${fmt(Number(a.usedCash)||0)})</div><input type="number" id="ei-ucash-${a.id}" placeholder="กรอกยอดใหม่" style="width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:7px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;"></div>
-        <div style="grid-column:span 2"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">📤 ยอดโอน QR แล้ว (${fmt(Number(a.usedScan)||0)})</div><input type="number" id="ei-uscan-${a.id}" placeholder="กรอกยอดใหม่" style="width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:7px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;"></div>
-      </div>
-      <input type="text" id="ei-note-${a.id}" placeholder="หมายเหตุ (ไม่บังคับ)" style="width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:7px;color:var(--text);font-family:var(--font);font-size:13px;padding:8px 12px;outline:none;margin-bottom:10px;">
-      <div style="display:flex;gap:8px;">
-        <button style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;font-family:var(--font);cursor:pointer;" onclick="saveInlineEdit('${a.id}')">💾 บันทึก</button>
-        <button style="background:var(--s2);color:var(--muted);border:1px solid var(--bd2);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;" onclick="toggleEditPanel('${a.id}')">✕ ยกเลิก</button>
-      </div>
-    </div>
-    <div class="acc-btns">
-      <button class="btn-sm" onclick="toggleEditPanel('${a.id}')" style="flex:1">✏️ แก้ไขยอด</button>
-      ${a.frozen
-        ?`<button class="btn-sm success" onclick="setFreeze('${a.id}',false)">🔓 ปลดอายัด</button>`
-        :`<button class="btn-sm danger" onclick="setFreeze('${a.id}',true)">🔒 อายัด</button>`}
-      <button class="btn-sm danger" onclick="delAcc('${a.id}')">🗑️</button>
-    </div>
-  </div>`;
+  const badge=frozen?'<span class="badge bg-red">\uD83D\uDD12 อายัด</span>':'<span class="badge bg-green">\u25CF ปกติ</span>';
+  const freezeBtn=frozen
+    ?`<button class="btn-sm success" onclick="setFreeze('${id}',false)">\uD83D\uDD13 ปลดอายัด</button>`
+    :`<button class="btn-sm danger" onclick="setFreeze('${id}',true)">\uD83D\uDD12 อายัด</button>`;
+
+  const inputStyle='width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:7px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;box-sizing:border-box;';
+
+  return (
+    `<div style="background:var(--s2);border:1px solid ${frozen?'rgba(240,79,79,.5)':'var(--bd)'};border-radius:11px;padding:13px;margin-bottom:10px;width:100%;box-sizing:border-box;">` +
+
+    // ── Header ──
+    `<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:6px;">` +
+      `<div style="min-width:0;flex:1;">` +
+        `<div style="font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.name||'—'}</div>` +
+        (a.brand?`<div style="font-size:11px;color:var(--purple);font-weight:600;margin-top:1px;">\uD83C\uDFF7 ${a.brand}</div>`:'') +
+        `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:1px;">${a.bank||''}${a.num?' \u00B7 ****'+a.num:''}</div>` +
+      `</div>` +
+      badge +
+    `</div>` +
+
+    // ── Balance row ──
+    `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;width:100%;">` +
+      `<div style="background:var(--s3);border-radius:8px;padding:9px 10px;min-width:0;">` +
+        `<div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB0 เงินคงเหลือ</div>` +
+        `<div style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--green);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${fmt(a.balance)}</div>` +
+      `</div>` +
+      `<div style="background:var(--s3);border-radius:8px;padding:9px 10px;min-width:0;">` +
+        `<div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCCA วงเงินบัญชีเหลือ</div>` +
+        `<div style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--blue);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${fmt(cashLeft)}</div>` +
+        `<div style="font-size:10px;color:var(--muted);margin-top:2px;">จาก ${fmt(cashLim)}</div>` +
+      `</div>` +
+    `</div>` +
+
+    // ── Limit row ──
+    `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;width:100%;">` +
+      `<div style="background:var(--s3);border-radius:8px;padding:8px 10px;min-width:0;">` +
+        `<div style="font-size:10px;color:var(--muted);margin-bottom:2px;">\uD83D\uDCB3 วงเงินกด (ATM)</div>` +
+        `<div style="font-family:var(--mono);font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${fmt(cashLim)}</div>` +
+        `<div style="background:var(--bg);border-radius:3px;height:4px;overflow:hidden;margin-top:5px;width:100%;"><div style="height:100%;border-radius:3px;width:${cPct.toFixed(1)}%;background:${cCol};"></div></div>` +
+        `<div style="font-size:10px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">ใช้ ${fmt(cashUsed)} \u00B7 เหลือ ${fmt(cashLeft)}</div>` +
+      `</div>` +
+      `<div style="background:var(--s3);border-radius:8px;padding:8px 10px;min-width:0;">` +
+        `<div style="font-size:10px;color:var(--muted);margin-bottom:2px;">\uD83D\uDCF2 วงเงินสแกน (QR)</div>` +
+        `<div style="font-family:var(--mono);font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${fmt(scanLim)}</div>` +
+        `<div style="background:var(--bg);border-radius:3px;height:4px;overflow:hidden;margin-top:5px;width:100%;"><div style="height:100%;border-radius:3px;width:${sPct.toFixed(1)}%;background:${sCol};"></div></div>` +
+        `<div style="font-size:10px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">ใช้ ${fmt(scanUsed)} \u00B7 เหลือ ${fmt(scanLeft)}</div>` +
+      `</div>` +
+    `</div>` +
+
+    // ── Inline edit panel (hidden by default) ──
+    `<div id="inline-edit-${id}" style="display:none;background:var(--s3);border-radius:10px;padding:13px;margin-bottom:10px;width:100%;box-sizing:border-box;">` +
+      `<div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:10px;">\u270F\uFE0F แก้ไขยอด</div>` +
+      `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;width:100%;">` +
+        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB0 เงินคงเหลือ (${fmt(Number(a.balance)||0)})</div><input type="number" id="ei-bal-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}"></div>` +
+        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB3 วงเงิน ATM (${fmt(cashLim)})</div><input type="number" id="ei-lcash-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}"></div>` +
+        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCF2 วงเงิน QR (${fmt(scanLim)})</div><input type="number" id="ei-lscan-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}"></div>` +
+        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB8 ยอดใช้ ATM (${fmt(cashUsed)})</div><input type="number" id="ei-ucash-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}"></div>` +
+        `<div style="grid-column:span 2;"><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCE4 ยอดโอน QR (${fmt(scanUsed)})</div><input type="number" id="ei-uscan-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}"></div>` +
+      `</div>` +
+      `<input type="text" id="ei-note-${id}" placeholder="หมายเหตุ (ไม่บังคับ)" style="${inputStyle.replace('font-family:var(--mono);','font-family:var(--font);')}margin-bottom:10px;">` +
+      `<div style="display:flex;gap:8px;">` +
+        `<button onclick="saveInlineEdit('${id}')" style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;font-family:var(--font);cursor:pointer;">\uD83D\uDCBE บันทึก</button>` +
+        `<button onclick="toggleEditPanel('${id}')" style="background:var(--s2);color:var(--muted);border:1px solid var(--bd2);border-radius:8px;padding:10px 16px;font-size:13px;font-family:var(--font);cursor:pointer;">\u2715 ยกเลิก</button>` +
+      `</div>` +
+    `</div>` +
+
+    // ── Buttons ──
+    `<div style="display:flex;gap:7px;flex-wrap:wrap;width:100%;">` +
+      `<button class="btn-sm" onclick="toggleEditPanel('${id}')" style="flex:1;">\u270F\uFE0F แก้ไขยอด</button>` +
+      freezeBtn +
+      `<button class="btn-sm danger" onclick="delAcc('${id}')">\uD83D\uDDD1\uFE0F</button>` +
+    `</div>` +
+
+    `</div>`
+  );
 }
 
 function renderAccFull(){

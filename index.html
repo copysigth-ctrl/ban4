@@ -302,6 +302,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="filter-btn" onclick="filterHist('ยอดเงิน',this)">💰 ยอดเงิน</div>
       <div class="filter-btn" onclick="filterHist('ส่งกดเงิน',this)">💳 กดเงิน</div>
       <div class="filter-btn" onclick="filterHist('โอนออก QR',this)">📲 โอน QR</div>
+      <div class="filter-btn" onclick="filterHist('เพิ่มบัญชี',this)">🏦 เพิ่มบัญชี</div>
+      <div class="filter-btn" onclick="filterHist('แก้ไขยอด',this)">✏️ แก้ยอด</div>
       <div class="filter-btn" onclick="filterHist('อื่นๆ',this)">📌 อื่นๆ</div>
     </div>
     <div id="hist-list"><div class="empty"><div class="empty-icon">📋</div>ยังไม่มีข้อมูล</div></div>
@@ -338,6 +340,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         <div class="field"><label>กลุ่มที่ส่ง</label><select id="sch-group"><option value="">— เลือก —</option></select></div>
       </div>
       <button class="btn btn-green" onclick="addSchedule()">⏰ เพิ่มกำหนดการ</button>
+    </div>
+    <div class="card">
+      <div class="s-sec">แจ้งเตือนอายัดบัญชีอัตโนมัติ</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.7">เมื่อมีการแจ้งอายัดบัญชี ระบบจะส่งข้อความแจ้งเตือนไปยังกลุ่มที่เลือกไว้ทันที</div>
+      <div id="freeze-alert-groups"><div style="font-size:12px;color:var(--muted)">กำลังโหลด...</div></div>
+      <div class="hint" style="margin-top:8px">ติ๊กกลุ่มที่ต้องการรับแจ้งเตือนเมื่อมีบัญชีถูกอายัด</div>
     </div>
     <div class="card">
       <div class="s-sec">ระบบ</div>
@@ -445,7 +453,7 @@ function launchApp(){
   document.getElementById('s-myname').value=local.myname||'';
   document.getElementById('s-token').value=local.token||'';
   document.getElementById('s-db-url').textContent=DB;
-  renderTGGroups(); renderSchedules();
+  renderTGGroups(); renderSchedules(); renderFreezeAlertGroups();
   startListeners(); startClock(); startSchChecker();
   setPresence(true);
   window.addEventListener('beforeunload',()=>setPresence(false));
@@ -537,8 +545,10 @@ function renderDashboard(){
   const accs=Object.values(accounts);
   const frozen=accs.filter(a=>a.frozen);
   const totalBal=accs.reduce((s,a)=>s+(Number(a.balance)||0),0);
-  const totalAtmLeft=accs.reduce((s,a)=>s+Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0)),0);
-  const totalQrLeft=accs.reduce((s,a)=>s+Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0)),0);
+  const atmAccs=accs.filter(a=>Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0))>0);
+  const totalAtmLeft=atmAccs.reduce((s,a)=>s+((Number(a.limitCash)||0)-(Number(a.usedCash)||0)),0);
+  const qrAccs=accs.filter(a=>Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0))>0);
+  const totalQrLeft=qrAccs.reduce((s,a)=>s+((Number(a.limitScan)||0)-(Number(a.usedScan)||0)),0);
   const totalSentCash=accs.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
   const today=todayStr();
   const todayUp=Object.values(updates).filter(u=>u.time&&u.time.includes(today));
@@ -546,8 +556,8 @@ function renderDashboard(){
   document.getElementById('d-total').textContent=fmt(totalBal);
   document.getElementById('d-frozen-count').textContent=frozen.length;
   document.getElementById('d-updates').textContent=todayUp.length;
-  document.getElementById('d-atm-left').textContent=fmt(totalAtmLeft);
-  document.getElementById('d-qr-left').textContent=fmt(totalQrLeft);
+  document.getElementById('d-atm-left').textContent=fmt(totalAtmLeft)+(atmAccs.length?` / ${atmAccs.length} บัญชี`:'');
+  document.getElementById('d-qr-left').textContent=fmt(totalQrLeft)+(qrAccs.length?` / ${qrAccs.length} บัญชี`:'');
   document.getElementById('d-sent-cash').textContent=fmt(totalSentCash);
   document.getElementById('d-freeze-alerts').innerHTML=frozen.map(a=>`
     <div class="alert alert-freeze">
@@ -557,6 +567,7 @@ function renderDashboard(){
     </div>`).join('');
   document.getElementById('d-acc-list').innerHTML=accs.length?accs.map(accMini).join(''):'<div class="empty"><div class="empty-icon">🏦</div>ยังไม่มีบัญชี</div>';
 }
+
 
 function accMini(a){
   const badge=a.frozen?'<span class="badge bg-red">🔒 อายัด</span>':'<span class="badge bg-green">● ปกติ</span>';
@@ -636,7 +647,7 @@ function renderOnline(){
 function renderHistory(){
   let arr=Object.values(updates).sort((a,b)=>b.createdAt-a.createdAt);
   if(histFilter!=='all')arr=arr.filter(u=>u.type===histFilter);
-  const tColor={'บัญชีถูกอายัด':'bg-red','ยอดเงิน':'bg-blue','ส่งกดเงิน':'bg-green','โอนออก QR':'bg-purple','อื่นๆ':'bg-yellow'};
+  const tColor={'บัญชีถูกอายัด':'bg-red','ยอดเงิน':'bg-blue','ส่งกดเงิน':'bg-green','โอนออก QR':'bg-purple','เพิ่มบัญชี':'bg-green','แก้ไขยอด':'bg-blue','อื่นๆ':'bg-yellow'};
   document.getElementById('hist-list').innerHTML=arr.length
     ?arr.slice(0,60).map(u=>`
       <div class="hist-item">
@@ -676,6 +687,7 @@ function renderTGGroups(){
     :'<div style="font-size:12px;color:var(--muted)">ยังไม่มีกลุ่ม</div>';
   const schOpts=(local.tgGroups||[]).map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
   ['sch-group','ms-group'].forEach(id=>{document.getElementById(id).innerHTML='<option value="">— เลือก —</option>'+schOpts;});
+  renderFreezeAlertGroups();
 }
 
 function renderUpdateTGGroups(){
@@ -690,6 +702,27 @@ function renderDashTGGroups(){
   el.innerHTML=(local.tgGroups||[]).length
     ?local.tgGroups.map(g=>`<div class="tg-group-check"><input type="checkbox" id="dtg-${g.id}" value="${g.id}" checked><label for="dtg-${g.id}" style="font-size:13px;cursor:pointer">${g.name}</label></div>`).join('')
     :'<div style="font-size:12px;color:var(--muted)">ยังไม่มีกลุ่ม — ตั้งค่าในหน้า ⚙️</div>';
+}
+
+function renderFreezeAlertGroups(){
+  const el=document.getElementById('freeze-alert-groups');
+  if(!el)return;
+  if(!local.tgGroups||!local.tgGroups.length){
+    el.innerHTML='<div style="font-size:12px;color:var(--muted)">ยังไม่มีกลุ่ม — เพิ่มกลุ่มก่อน</div>'; return;
+  }
+  if(!local.freezeAlertGroups)local.freezeAlertGroups=[];
+  el.innerHTML=local.tgGroups.map(g=>`
+    <div class="tg-group-check">
+      <input type="checkbox" id="fag-${g.id}" value="${g.id}" ${local.freezeAlertGroups.includes(g.id)?'checked':''} onchange="toggleFreezeGroup('${g.id}',this.checked)">
+      <label for="fag-${g.id}" style="font-size:13px;cursor:pointer">${g.name}</label>
+    </div>`).join('');
+}
+
+function toggleFreezeGroup(id,checked){
+  if(!local.freezeAlertGroups)local.freezeAlertGroups=[];
+  if(checked){if(!local.freezeAlertGroups.includes(id))local.freezeAlertGroups.push(id);}
+  else{local.freezeAlertGroups=local.freezeAlertGroups.filter(x=>x!==id);}
+  saveLocal();
 }
 
 function renderSchedules(){
@@ -781,7 +814,16 @@ async function submitUpdate(){
   const btn=document.getElementById('ut-btn');
   btn.disabled=true; btn.textContent='กำลังส่ง...';
 
-  if(selType==='บัญชีถูกอายัด'&&accId) await fbSet('accounts/'+accId+'/frozen',true);
+  if(selType==='บัญชีถูกอายัด'&&accId){
+    await fbSet('accounts/'+accId+'/frozen',true);
+    if(local.token){
+      const fLog={type:'บัญชีถูกอายัด',accId,accName:acc?.name||'',accBank:acc?.bank||'',accBrand:acc?.brand||'',amount:0,detail:document.getElementById('ut-detail').value.trim()||`บัญชี ${acc?.name||''} ถูกอายัด`,reporter:local.myname||'—',time:ts(),createdAt:Date.now()};
+      const alertGroups=(local.freezeAlertGroups&&local.freezeAlertGroups.length>0)
+        ?local.tgGroups.filter(g=>local.freezeAlertGroups.includes(g.id))
+        :local.tgGroups||[];
+      for(const g of alertGroups)await sendTG(g.id,buildFreezeMsg(fLog));
+    }
+  }
   if(selType==='ส่งกดเงิน'&&accId&&amount>0){
     await fbSet('accounts/'+accId+'/usedCash',(Number(acc?.usedCash)||0)+amount);
   }
@@ -814,6 +856,20 @@ function buildMsg(log){
     +(log.type==='บัญชีถูกอายัด'?'\n\n⚠️ กรุณาดำเนินการทันที':'');
 }
 
+function buildFreezeMsg(log){
+  return `🚨🚨🚨 *แจ้งด่วน — บัญชีถูกอายัด!*
+*ทีม: ${cfg.team}*
+
+🏦 *บัญชี:* ${log.accName||'ไม่ระบุ'}
+${log.accBank?`🏛 *ธนาคาร:* ${log.accBank}
+`:''}${log.accBrand?`🏷 *แบรนด์:* ${log.accBrand}
+`:''}
+👤 *ผู้แจ้ง:* ${log.reporter}
+🕐 ${log.time}
+
+⚠️ กรุณาดำเนินการทันที!`;
+}
+
 // ── TG SEND ──
 async function sendTG(chatId,msg){
   if(!local.token||!chatId)return;
@@ -832,15 +888,17 @@ async function sendDashToGroup(groupId,note){
   const accs=Object.values(accounts);
   const frozen=accs.filter(a=>a.frozen);
   const totalBal=accs.reduce((s,a)=>s+(Number(a.balance)||0),0);
-  const totalAtmLeft=accs.reduce((s,a)=>s+Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0)),0);
-  const totalQrLeft=accs.reduce((s,a)=>s+Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0)),0);
+  const atmAccs=accs.filter(a=>Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0))>0);
+  const totalAtmLeft=atmAccs.reduce((s,a)=>s+((Number(a.limitCash)||0)-(Number(a.usedCash)||0)),0);
+  const qrAccs=accs.filter(a=>Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0))>0);
+  const totalQrLeft=qrAccs.reduce((s,a)=>s+((Number(a.limitScan)||0)-(Number(a.usedScan)||0)),0);
   const totalSentCash=accs.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
   const todayUp=Object.values(updates).filter(u=>u.time&&u.time.includes(todayStr()));
   let msg=`📊 *สรุปภาพรวม — ${cfg.team}*\n_(${note})_\n\n`;
   msg+=`🏦 *บัญชีทั้งหมด:* ${accs.length} บัญชี\n`;
   msg+=`💰 *ยอดรวมคงเหลือ:* ${fmt(totalBal)}\n`;
-  msg+=`💳 *วงเงินกด ATM รวม:* ${fmt(totalAtmLeft)}\n`;
-  msg+=`📲 *วงเงิน QR รวม:* ${fmt(totalQrLeft)}\n`;
+  msg+=`💳 *วงเงินกด ATM:* ${fmt(totalAtmLeft)} / ${atmAccs.length} บัญชี\n`;
+  msg+=`📲 *วงเงิน QR:* ${fmt(totalQrLeft)} / ${qrAccs.length} บัญชี\n`;
   msg+=`💸 *ยอดเงินส่งกดรวม:* ${fmt(totalSentCash)}\n`;
   msg+=`🔒 *บัญชีถูกอายัด:* ${frozen.length} บัญชี\n`;
   msg+=`📝 *อัปเดตวันนี้:* ${todayUp.length} รายการ\n`;
@@ -863,6 +921,9 @@ async function saveAccount(){
     limitScan:parseFloat(document.getElementById('m-lscan').value)||0,
     usedCash:0,usedScan:0,frozen:false,createdAt:Date.now()
   });
+  const accData={id,name,brand:document.getElementById('m-brand').value.trim(),bank:document.getElementById('m-bank').value};
+  const addLog={type:'เพิ่มบัญชี',accId:id,accName:name,accBank:accData.bank,accBrand:accData.brand,amount:parseFloat(document.getElementById('m-balance').value)||0,detail:`เพิ่มบัญชีใหม่: ${name} — ${accData.bank||''}${accData.brand?' ('+accData.brand+')':''}`,reporter:local.myname||'ระบบ',time:ts(),createdAt:Date.now()};
+  await fbPush('updates',addLog);
   closeModal('modal-acc');
   ['m-name','m-brand','m-bank','m-num','m-balance','m-lcash','m-lscan'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   showToast('✅ เพิ่มบัญชีแล้ว','ok');
@@ -875,19 +936,29 @@ async function setFreeze(id,val){
   await fbSet('accounts/'+id+'/frozen',val);
   if(val){
     const a=accounts[id];
-    const log={type:'บัญชีถูกอายัด',accId:id,accName:a?.name||'',amount:0,detail:'แจ้งอายัดจากหน้าบัญชี',reporter:local.myname||'—',time:ts(),createdAt:Date.now()};
+    const log={type:'บัญชีถูกอายัด',accId:id,accName:a?.name||'',accBank:a?.bank||'',accBrand:a?.brand||'',amount:0,detail:`🚨 บัญชี ${a?.name||''} (${a?.bank||''}) ถูกอายัด`,reporter:local.myname||'—',time:ts(),createdAt:Date.now()};
     await fbPush('updates',log);
-    if(local.token&&local.tgGroups){for(const g of local.tgGroups)await sendTG(g.id,buildMsg(log));}
+    if(local.token){
+      const alertGroups=(local.freezeAlertGroups&&local.freezeAlertGroups.length>0)
+        ?local.tgGroups.filter(g=>local.freezeAlertGroups.includes(g.id))
+        :local.tgGroups||[];
+      for(const g of alertGroups)await sendTG(g.id,buildFreezeMsg(log));
+    }
   }
   showToast(val?'🔒 แจ้งอายัดแล้ว':'🔓 ปลดอายัดแล้ว',val?'warn':'ok');
-}
 async function editBal(id){
   const a=accounts[id];
-  const val=prompt(`อัปเดตยอดของ ${a?.name||id}\nปัจจุบัน: ${fmt(a?.balance)}\n\nกรอกยอดใหม่:`);
+  const oldBal=Number(a?.balance)||0;
+  const val=prompt(`อัปเดตยอดของ ${a?.name||id}\nปัจจุบัน: ${fmt(oldBal)}\n\nกรอกยอดใหม่:`);
   if(val===null)return;
   const n=parseFloat(val);
   if(isNaN(n))return showToast('ตัวเลขไม่ถูกต้อง','err');
-  await fbSet('accounts/'+id+'/balance',n); showToast('✅ อัปเดตยอดแล้ว','ok');
+  await fbSet('accounts/'+id+'/balance',n);
+  const diff=n-oldBal;
+  const editLog={type:'แก้ไขยอด',accId:id,accName:a?.name||'',amount:n,detail:`ยอดเดิม: ${fmt(oldBal)} → ยอดใหม่: ${fmt(n)} (${diff>=0?'+':''}${fmt(diff)})`,reporter:local.myname||'ระบบ',time:ts(),createdAt:Date.now()};
+  await fbPush('updates',editLog);
+  showToast('✅ อัปเดตยอดแล้ว','ok');
+}
 }
 
 // ── NAV ──

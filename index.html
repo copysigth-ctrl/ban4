@@ -237,7 +237,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         <div class="chip-row">
           <div class="chip" onclick="pickType('บัญชีถูกอายัด',this,'sel-red')">🔒 อายัด</div>
           <div class="chip" onclick="pickType('ยอดเงิน',this,'sel-blue')">💰 ยอดเงิน</div>
-          <div class="chip" onclick="pickType('ส่งกดเงิน',this,'sel-green')">💳 กดเงิน</div>
+          <div class="chip" onclick="pickType('ส่งกดเงิน',this,'sel-green')">💳 ส่งกดเงิน</div>
+          <div class="chip" onclick="pickType('โอนออก QR',this,'sel-yellow')">📲 โอนออก QR</div>
           <div class="chip" onclick="pickType('อื่นๆ',this,'sel-yellow')">📌 อื่นๆ</div>
         </div>
       </div>
@@ -268,6 +269,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="stat"><div class="stat-val" id="d-total" style="color:var(--green)">—</div><div class="stat-lbl">ยอดรวมคงเหลือ</div></div>
       <div class="stat"><div class="stat-val" id="d-frozen-count" style="color:var(--red)">—</div><div class="stat-lbl">บัญชีถูกอายัด</div></div>
       <div class="stat"><div class="stat-val" id="d-updates" style="color:var(--yellow)">—</div><div class="stat-lbl">อัปเดตวันนี้</div></div>
+      <div class="stat"><div class="stat-val" id="d-atm-left" style="color:var(--blue)">—</div><div class="stat-lbl">💳 วงเงินกด ATM รวม</div></div>
+      <div class="stat"><div class="stat-val" id="d-qr-left" style="color:var(--purple)">—</div><div class="stat-lbl">📲 วงเงิน QR รวม</div></div>
+      <div class="stat" style="grid-column:span 2"><div class="stat-val" id="d-sent-cash" style="color:var(--yellow);font-size:16px">—</div><div class="stat-lbl">💸 ยอดเงินส่งกดรวมทุกบัญชี</div></div>
     </div>
     <div id="d-freeze-alerts"></div>
     <div class="tg-send-box">
@@ -297,6 +301,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="filter-btn" onclick="filterHist('บัญชีถูกอายัด',this)">🔒 อายัด</div>
       <div class="filter-btn" onclick="filterHist('ยอดเงิน',this)">💰 ยอดเงิน</div>
       <div class="filter-btn" onclick="filterHist('ส่งกดเงิน',this)">💳 กดเงิน</div>
+      <div class="filter-btn" onclick="filterHist('โอนออก QR',this)">📲 โอน QR</div>
       <div class="filter-btn" onclick="filterHist('อื่นๆ',this)">📌 อื่นๆ</div>
     </div>
     <div id="hist-list"><div class="empty"><div class="empty-icon">📋</div>ยังไม่มีข้อมูล</div></div>
@@ -532,12 +537,18 @@ function renderDashboard(){
   const accs=Object.values(accounts);
   const frozen=accs.filter(a=>a.frozen);
   const totalBal=accs.reduce((s,a)=>s+(Number(a.balance)||0),0);
+  const totalAtmLeft=accs.reduce((s,a)=>s+Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0)),0);
+  const totalQrLeft=accs.reduce((s,a)=>s+Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0)),0);
+  const totalSentCash=accs.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
   const today=todayStr();
   const todayUp=Object.values(updates).filter(u=>u.time&&u.time.includes(today));
   document.getElementById('d-count').textContent=accs.length;
   document.getElementById('d-total').textContent=fmt(totalBal);
   document.getElementById('d-frozen-count').textContent=frozen.length;
   document.getElementById('d-updates').textContent=todayUp.length;
+  document.getElementById('d-atm-left').textContent=fmt(totalAtmLeft);
+  document.getElementById('d-qr-left').textContent=fmt(totalQrLeft);
+  document.getElementById('d-sent-cash').textContent=fmt(totalSentCash);
   document.getElementById('d-freeze-alerts').innerHTML=frozen.map(a=>`
     <div class="alert alert-freeze">
       <div class="alert-icon">🔒</div>
@@ -625,7 +636,7 @@ function renderOnline(){
 function renderHistory(){
   let arr=Object.values(updates).sort((a,b)=>b.createdAt-a.createdAt);
   if(histFilter!=='all')arr=arr.filter(u=>u.type===histFilter);
-  const tColor={'บัญชีถูกอายัด':'bg-red','ยอดเงิน':'bg-blue','ส่งกดเงิน':'bg-green','อื่นๆ':'bg-yellow'};
+  const tColor={'บัญชีถูกอายัด':'bg-red','ยอดเงิน':'bg-blue','ส่งกดเงิน':'bg-green','โอนออก QR':'bg-purple','อื่นๆ':'bg-yellow'};
   document.getElementById('hist-list').innerHTML=arr.length
     ?arr.slice(0,60).map(u=>`
       <div class="hist-item">
@@ -774,6 +785,9 @@ async function submitUpdate(){
   if(selType==='ส่งกดเงิน'&&accId&&amount>0){
     await fbSet('accounts/'+accId+'/usedCash',(Number(acc?.usedCash)||0)+amount);
   }
+  if(selType==='โอนออก QR'&&accId&&amount>0){
+    await fbSet('accounts/'+accId+'/usedScan',(Number(acc?.usedScan)||0)+amount);
+  }
   if(selType==='ยอดเงิน'&&accId&&amount>0){
     await fbSet('accounts/'+accId+'/balance',amount);
   }
@@ -792,7 +806,7 @@ async function submitUpdate(){
 }
 
 function buildMsg(log){
-  const e={'บัญชีถูกอายัด':'🚨','ยอดเงิน':'💰','ส่งกดเงิน':'💳','อื่นๆ':'📌'}[log.type]||'📌';
+  const e={'บัญชีถูกอายัด':'🚨','ยอดเงิน':'💰','ส่งกดเงิน':'💳','โอนออก QR':'📲','อื่นๆ':'📌'}[log.type]||'📌';
   return `${e} *${log.type} — ${cfg.team}*\n\n🏦 *บัญชี:* ${log.accName||'ไม่ระบุ'}\n`
     +(log.amount?`💵 *ยอดเงิน:* ${fmt(log.amount)}\n`:'')
     +(log.detail?`📝 *รายละเอียด:* ${log.detail}\n`:'')
@@ -818,17 +832,22 @@ async function sendDashToGroup(groupId,note){
   const accs=Object.values(accounts);
   const frozen=accs.filter(a=>a.frozen);
   const totalBal=accs.reduce((s,a)=>s+(Number(a.balance)||0),0);
+  const totalAtmLeft=accs.reduce((s,a)=>s+Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0)),0);
+  const totalQrLeft=accs.reduce((s,a)=>s+Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0)),0);
+  const totalSentCash=accs.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
   const todayUp=Object.values(updates).filter(u=>u.time&&u.time.includes(todayStr()));
   let msg=`📊 *สรุปภาพรวม — ${cfg.team}*\n_(${note})_\n\n`;
   msg+=`🏦 *บัญชีทั้งหมด:* ${accs.length} บัญชี\n`;
   msg+=`💰 *ยอดรวมคงเหลือ:* ${fmt(totalBal)}\n`;
+  msg+=`💳 *วงเงินกด ATM รวม:* ${fmt(totalAtmLeft)}\n`;
+  msg+=`📲 *วงเงิน QR รวม:* ${fmt(totalQrLeft)}\n`;
+  msg+=`💸 *ยอดเงินส่งกดรวม:* ${fmt(totalSentCash)}\n`;
   msg+=`🔒 *บัญชีถูกอายัด:* ${frozen.length} บัญชี\n`;
   msg+=`📝 *อัปเดตวันนี้:* ${todayUp.length} รายการ\n`;
   if(frozen.length){msg+='\n⚠️ *บัญชีที่ถูกอายัด:*\n';frozen.forEach(a=>{msg+=`• ${a.name} (${a.bank||''})\n`;});}
   msg+=`\n🕐 ${ts()}`;
   await sendTG(groupId,msg);
 }
-
 // ── ACCOUNTS CRUD ──
 function openAddAcc(){document.getElementById('modal-acc').classList.add('open');}
 async function saveAccount(){

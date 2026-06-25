@@ -46,6 +46,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .top-right{display:flex;align-items:center;gap:6px;}
 .clock{font-family:var(--mono);font-size:11px;color:var(--muted);}
 .user-chip{font-size:11px;background:var(--s2);border:1px solid var(--bd);border-radius:20px;padding:3px 9px;color:var(--muted);}
+.shift-chip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;}
+.shift-day{background:rgba(245,183,49,.15);color:var(--yellow);}
+.shift-night{background:rgba(155,108,255,.15);color:var(--purple);}
 
 .nav{display:flex;background:var(--s1);border-bottom:1px solid var(--bd);overflow-x:auto;scrollbar-width:none;}
 .nav::-webkit-scrollbar{display:none;}
@@ -63,36 +66,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
 .card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px;}
 .card-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;}
-
-.acc-card{background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:13px;margin-bottom:10px;width:100%;min-width:0;box-sizing:border-box;}
-.acc-card.frozen{border-color:rgba(240,79,79,.5);background:rgba(240,79,79,.04);}
-.acc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:6px;width:100%;min-width:0;}
-.acc-name{font-weight:700;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.acc-brand{font-size:11px;color:var(--purple);font-weight:600;margin-top:1px;}
-.acc-num{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:1px;}
-.badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
-.bg-green{background:rgba(45,214,123,.15);color:var(--green);}
-.bg-red{background:rgba(240,79,79,.2);color:var(--red);}
-.bg-yellow{background:rgba(245,183,49,.15);color:var(--yellow);}
-.bg-blue{background:rgba(74,143,255,.15);color:var(--blue);}
-
-.bal-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;width:100%;min-width:0;}
-.bal-box{background:var(--s3);border-radius:8px;padding:9px 10px;min-width:0;overflow:hidden;}
-.bal-label{font-size:10px;color:var(--muted);margin-bottom:3px;}
-.bal-val{font-family:var(--mono);font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.bal-sub{font-size:10px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-
-.limit-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;width:100%;min-width:0;}
-.limit-box{background:var(--s3);border-radius:8px;padding:8px 10px;min-width:0;overflow:hidden;}
-.limit-label{font-size:10px;color:var(--muted);margin-bottom:2px;}
-.limit-val{font-family:var(--mono);font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.prog-bar{background:var(--bg);border-radius:3px;height:4px;overflow:hidden;margin-top:5px;width:100%;}
-.prog-fill{height:100%;border-radius:3px;transition:width .4s;}
-
-.acc-btns{display:flex;gap:7px;margin-top:10px;width:100%;flex-wrap:wrap;}
-.btn-sm{padding:7px 10px;font-size:11px;font-weight:600;font-family:var(--font);border-radius:6px;cursor:pointer;background:var(--s3);color:var(--muted);border:1px solid var(--bd2);display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
-.btn-sm.danger{color:var(--red);border-color:rgba(240,79,79,.3);}
-.btn-sm.success{color:var(--green);border-color:rgba(45,214,123,.3);}
 
 .field{margin-bottom:12px;}
 .field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;}
@@ -112,6 +85,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .chip.sel-red{background:rgba(240,79,79,.12);color:var(--red);border-color:rgba(240,79,79,.4);}
 .chip.sel-yellow{background:rgba(245,183,49,.12);color:var(--yellow);border-color:rgba(245,183,49,.4);}
 .chip.sel-blue{background:rgba(74,143,255,.12);color:var(--blue);border-color:rgba(74,143,255,.4);}
+.chip.sel-purple{background:rgba(155,108,255,.12);color:var(--purple);border-color:rgba(155,108,255,.4);}
 
 .btn{width:100%;border:none;border-radius:9px;padding:13px;font-size:14px;font-weight:700;font-family:var(--font);cursor:pointer;transition:opacity .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:0;}
 .btn:active{transform:scale(.97);}
@@ -119,6 +93,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .btn-primary{background:var(--blue);color:#fff;}
 .btn-danger{background:rgba(240,79,79,.12);color:var(--red);border:1px solid rgba(240,79,79,.4);}
 .btn-green{background:rgba(45,214,123,.1);color:var(--green);border:1px solid rgba(45,214,123,.3);}
+
+.btn-sm{padding:7px 10px;font-size:11px;font-weight:600;font-family:var(--font);border-radius:6px;cursor:pointer;background:var(--s3);color:var(--muted);border:1px solid var(--bd2);display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+.btn-sm.danger{color:var(--red);border-color:rgba(240,79,79,.3);}
+.btn-sm.success{color:var(--green);border-color:rgba(45,214,123,.3);}
 
 .alert{border-radius:10px;padding:12px 14px;margin-bottom:10px;display:flex;gap:10px;align-items:flex-start;}
 .alert-freeze{background:rgba(240,79,79,.09);border:1px solid rgba(240,79,79,.35);}
@@ -171,6 +149,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .hint{font-size:11px;color:var(--muted);line-height:1.6;margin-top:5px;}
 .hint a{color:var(--blue);text-decoration:none;}
 
+/* Brand group card in dashboard */
+.brand-group-card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px;}
+.brand-group-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;cursor:pointer;}
+.brand-group-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.brand-group-toggle{font-size:12px;color:var(--muted);transition:transform .2s;}
+.brand-group-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;}
+.brand-stat-box{background:var(--s2);border-radius:8px;padding:8px 10px;}
+.brand-stat-lbl{font-size:10px;color:var(--muted);margin-bottom:2px;}
+.brand-stat-val{font-family:var(--mono);font-size:12px;font-weight:600;}
+.brand-accs{display:none;}
+.brand-accs.open{display:block;}
+
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--s2);border:1px solid var(--bd2);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;z-index:9999;transition:transform .3s;white-space:nowrap;display:flex;align-items:center;gap:8px;max-width:90vw;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast.ok{border-color:rgba(45,214,123,.4);color:var(--green);}
@@ -216,6 +206,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="logo"><div class="live-dot" id="live-dot"></div>SANJIDATA</div>
     <div class="top-right">
       <span class="sync-badge sync-off" id="sync-badge">เชื่อมต่อ...</span>
+      <span class="shift-chip shift-day" id="shift-chip">☀️ เช้า</span>
       <span class="user-chip" id="user-chip">—</span>
       <span class="clock" id="clock">--:--</span>
     </div>
@@ -228,10 +219,17 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="nav-item" onclick="goPage('settings')"><span class="nav-icon">⚙️</span>ตั้งค่า</div>
   </div>
 
-  <!-- UPDATE (หน้าแรก) -->
+  <!-- UPDATE -->
   <div class="page active" id="page-update">
     <div class="card">
       <div class="card-title">แจ้งอัปเดต / แจ้งปัญหา</div>
+      <div class="field">
+        <label>กะทำงาน</label>
+        <div class="chip-row">
+          <div class="chip" id="shift-chip-morning" onclick="pickShift('เช้า',this,'sel-yellow')">☀️ กะเช้า</div>
+          <div class="chip" id="shift-chip-night" onclick="pickShift('ดึก',this,'sel-purple')">🌙 กะดึก</div>
+        </div>
+      </div>
       <div class="field">
         <label>ประเภท</label>
         <div class="chip-row">
@@ -284,6 +282,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     </div>
     <div class="sec-label">ออนไลน์ในทีม</div>
     <div class="online-row" id="online-row"><div style="font-size:12px;color:var(--muted)">กำลังโหลด...</div></div>
+    <div class="sec-label" style="margin-top:6px">สรุปรายแบรนด์</div>
+    <div id="d-brand-groups"></div>
     <div class="sec-label" style="margin-top:6px">บัญชีทั้งหมด</div>
     <div id="d-acc-list"><div class="empty"><div class="empty-icon">🏦</div>ยังไม่มีบัญชี</div></div>
   </div>
@@ -314,7 +314,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="card">
       <div class="s-sec">ข้อมูลผู้ใช้</div>
       <div class="field"><label>ชื่อของคุณ</label><input id="s-myname" placeholder="ชื่อ-นามสกุล"></div>
-      <button class="btn btn-primary" onclick="saveUserSettings()">💾 บันทึกชื่อ</button>
+      <div class="field">
+        <label>กะทำงานปัจจุบัน</label>
+        <div class="chip-row">
+          <div class="chip" id="s-shift-day" onclick="setShiftSetting('เช้า')">☀️ กะเช้า</div>
+          <div class="chip" id="s-shift-night" onclick="setShiftSetting('ดึก')">🌙 กะดึก</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveUserSettings()">💾 บันทึก</button>
     </div>
     <div class="card">
       <div class="s-sec">Telegram Bot</div>
@@ -361,11 +368,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <!-- MODAL: ADD ACCOUNT -->
 <div class="modal-bg" id="modal-acc">
   <div class="modal">
-    <div class="modal-hd"><div class="modal-title">เพิ่มบัญชีใหม่</div><button class="modal-close" onclick="closeModal('modal-acc')">✕</button></div>
+    <div class="modal-hd"><div class="modal-title" id="modal-acc-title">เพิ่มบัญชีใหม่</div><button class="modal-close" onclick="closeModal('modal-acc')">✕</button></div>
     <div class="field-row">
       <div class="field"><label>ชื่อเจ้าของบัญชี</label><input id="m-name" placeholder="ชื่อ-สกุล"></div>
-      <div class="field"><label>แบรนด์ / ทีม</label><input id="m-brand" placeholder="เช่น ทีม A"></div>
+      <div class="field"><label>แบรนด์ / ทีม</label><input id="m-brand" placeholder="เช่น KK, TDD"></div>
     </div>
+    <div class="field"><label>รายละเอียดเพิ่มเติม</label><textarea id="m-detail" placeholder="หมายเหตุ, รายละเอียดพิเศษ, ข้อมูลสำคัญ..."></textarea></div>
     <div class="field-row">
       <div class="field"><label>ธนาคาร</label>
         <select id="m-bank">
@@ -381,7 +389,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="field"><label>วงเงินกด/ATM (฿)</label><div class="pfx"><span>฿</span><input type="number" class="mono" id="m-lcash" placeholder="0"></div></div>
       <div class="field"><label>วงเงินสแกน/QR (฿)</label><div class="pfx"><span>฿</span><input type="number" class="mono" id="m-lscan" placeholder="0"></div></div>
     </div>
-    <button class="btn btn-primary" onclick="saveAccount()">💾 บันทึก</button>
+    <input type="hidden" id="m-edit-id">
+    <button class="btn btn-primary" id="m-save-btn" onclick="saveAccount()">💾 บันทึก</button>
   </div>
 </div>
 
@@ -397,65 +406,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   </div>
 </div>
 
-<!-- MODAL: EDIT BALANCE -->
-<div class="modal-bg" id="modal-editbal">
-  <div class="modal">
-    <div class="modal-hd">
-      <div>
-        <div class="modal-title">✏️ แก้ไขยอดเงิน</div>
-        <div id="eb-accname" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
-      </div>
-      <button class="modal-close" onclick="closeModal('modal-editbal')">✕</button>
-    </div>
-    <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
-      <div style="font-size:11px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">ยอดปัจจุบัน</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-        <div><div style="font-size:10px;color:var(--muted)">เงินคงเหลือ</div><div id="eb-cur-bal" style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--green)">—</div></div>
-        <div><div style="font-size:10px;color:var(--muted)">วงเงิน ATM</div><div id="eb-cur-atm" style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--blue)">—</div></div>
-        <div><div style="font-size:10px;color:var(--muted)">วงเงิน QR</div><div id="eb-cur-qr" style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--purple)">—</div></div>
-      </div>
-    </div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">แก้ไขเป็น (เว้นว่างถ้าไม่เปลี่ยน)</div>
-    <div class="field">
-      <label>💰 เงินคงเหลือในบัญชี (฿)</label>
-      <div class="pfx"><span>฿</span><input type="number" class="mono" id="eb-balance" placeholder="ไม่เปลี่ยน"></div>
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label>💳 วงเงินกด ATM (฿)</label>
-        <div class="pfx"><span>฿</span><input type="number" class="mono" id="eb-lcash" placeholder="ไม่เปลี่ยน"></div>
-      </div>
-      <div class="field">
-        <label>📲 วงเงิน QR (฿)</label>
-        <div class="pfx"><span>฿</span><input type="number" class="mono" id="eb-lscan" placeholder="ไม่เปลี่ยน"></div>
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label>💸 ยอดใช้ ATM แล้ว (฿)</label>
-        <div class="pfx"><span>฿</span><input type="number" class="mono" id="eb-ucash" placeholder="ไม่เปลี่ยน"></div>
-      </div>
-      <div class="field">
-        <label>📤 ยอดโอน QR แล้ว (฿)</label>
-        <div class="pfx"><span>฿</span><input type="number" class="mono" id="eb-uscan" placeholder="ไม่เปลี่ยน"></div>
-      </div>
-    </div>
-    <div class="field">
-      <label>หมายเหตุ</label>
-      <input type="text" id="eb-note" placeholder="เหตุผลในการแก้ไข (ไม่บังคับ)">
-    </div>
-    <input type="hidden" id="eb-accid">
-    <button class="btn btn-primary" onclick="saveEditBal()">💾 บันทึกการแก้ไข</button>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script>
 let DB='', cfg=JSON.parse(localStorage.getItem('fw_cfg3')||'null');
 let local=JSON.parse(localStorage.getItem('fw_local3')||'{}');
 let accounts={}, updates={}, presence={};
-let unsubFns=[], schTimers=[], histFilter='all', selType='';
+let unsubFns=[], schTimers=[], histFilter='all', selType='', selShift='';
+// Dirty-flag: suppress re-render while user has unsaved inline edits
+let dirtyEdits=new Set();
 
 // ── LOGIN ──
 async function doLogin(){
@@ -501,10 +460,12 @@ function launchApp(){
   if(!local.myname) document.getElementById('modal-name').classList.add('open');
   if(!local.tgGroups) local.tgGroups=[];
   if(!local.schedules) local.schedules=[];
+  if(!local.shift) local.shift='เช้า';
   document.getElementById('user-chip').textContent=local.myname||'—';
   document.getElementById('s-myname').value=local.myname||'';
   document.getElementById('s-token').value=local.token||'';
   document.getElementById('s-db-url').textContent=DB;
+  updateShiftDisplay();
   renderTGGroups(); renderSchedules(); renderFreezeAlertGroups();
   startListeners(); startClock(); startSchChecker();
   setPresence(true);
@@ -522,6 +483,30 @@ function saveName(){
 
 function saveLocal(){localStorage.setItem('fw_local3',JSON.stringify(local));}
 
+// ── SHIFT ──
+function pickShift(val,el,cls){
+  selShift=val;
+  document.querySelectorAll('#page-update .chip[id^="shift-chip"]').forEach(c=>c.className='chip');
+  el.classList.add(cls);
+}
+
+function setShiftSetting(val){
+  local.shift=val; saveLocal(); updateShiftDisplay();
+  document.querySelectorAll('#s-shift-day,#s-shift-night').forEach(c=>c.className='chip');
+  document.getElementById(val==='เช้า'?'s-shift-day':'s-shift-night').classList.add(val==='เช้า'?'sel-yellow':'sel-purple');
+  showToast('✅ เปลี่ยนกะเป็น '+(val==='เช้า'?'☀️ กะเช้า':'🌙 กะดึก'),'ok');
+}
+
+function updateShiftDisplay(){
+  const s=local.shift||'เช้า';
+  const chip=document.getElementById('shift-chip');
+  if(chip){chip.textContent=s==='เช้า'?'☀️ เช้า':'🌙 ดึก';chip.className='shift-chip '+(s==='เช้า'?'shift-day':'shift-night');}
+  const sd=document.getElementById('s-shift-day');
+  const sn=document.getElementById('s-shift-night');
+  if(sd)sd.className='chip'+(s==='เช้า'?' sel-yellow':'');
+  if(sn)sn.className='chip'+(s==='ดึก'?' sel-purple':'');
+}
+
 // ── FIREBASE ──
 function fbUrl(p){return DB+'/'+p+'.json';}
 async function fbSet(p,d){await fetch(fbUrl(p),{method:'PUT',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}});}
@@ -530,8 +515,18 @@ async function fbDel(p){await fetch(fbUrl(p),{method:'DELETE'});}
 
 function fbListen(path,cb){
   const es=new EventSource(DB+'/'+path+'.json');
-  es.addEventListener('put',e=>{try{cb(JSON.parse(e.data).data);}catch(x){}});
-  es.addEventListener('patch',e=>{try{const d=JSON.parse(e.data).data;if(d)cb(d);}catch(x){}});
+  es.addEventListener('put',e=>{
+    try{
+      const data=JSON.parse(e.data).data;
+      cb(data,'put');
+    }catch(x){}
+  });
+  es.addEventListener('patch',e=>{
+    try{
+      const data=JSON.parse(e.data).data;
+      if(data)cb(data,'patch');
+    }catch(x){}
+  });
   es.onerror=()=>setSyncStatus(false);
   es.onopen=()=>setSyncStatus(true);
   return()=>es.close();
@@ -547,15 +542,47 @@ function setSyncStatus(ok){
 }
 
 function startListeners(){
-  unsubFns.push(fbListen('accounts',d=>{accounts=d||{};renderAll();}));
-  unsubFns.push(fbListen('updates',d=>{updates=d||{};renderAll();}));
-  unsubFns.push(fbListen('presence',d=>{presence=d||{};renderOnline();}));
+  unsubFns.push(fbListen('accounts',(d,evType)=>{
+    if(evType==='put'){
+      accounts=d||{};
+    } else {
+      // patch: merge only changed keys, preserve dirty edits' account data
+      if(d){
+        Object.keys(d).forEach(k=>{
+          if(d[k]===null){ delete accounts[k]; }
+          else { accounts[k]={...(accounts[k]||{}), ...d[k]}; }
+        });
+      }
+    }
+    renderAllSafe();
+  }));
+  unsubFns.push(fbListen('updates',(d,evType)=>{
+    if(evType==='put'){updates=d||{};}
+    else if(d){Object.keys(d).forEach(k=>{if(d[k]===null)delete updates[k]; else updates[k]=d[k];});}
+    renderHistory();
+    renderDashStats();
+  }));
+  unsubFns.push(fbListen('presence',(d,evType)=>{
+    if(evType==='put'){presence=d||{};}
+    else if(d){Object.keys(d).forEach(k=>{if(d[k]===null)delete presence[k]; else presence[k]=d[k];});}
+    renderOnline();
+  }));
+}
+
+// Safe render: skip re-rendering inline edit panels that are open (user typing)
+function renderAllSafe(){
+  renderDashboard();
+  renderAccFullSafe();
+  renderHistory();
+  populateSels();
+  renderUpdateTGGroups();
+  renderDashTGGroups();
 }
 
 async function setPresence(on){
   if(!local.myname)return;
   const k=local.myname.replace(/[^\w\u0E00-\u0E7F]/g,'_');
-  await fbSet('presence/'+k,{name:local.myname,online:on,t:Date.now()});
+  await fbSet('presence/'+k,{name:local.myname,online:on,shift:local.shift||'เช้า',t:Date.now()});
 }
 
 // ── CLOCK & SCHEDULER ──
@@ -593,7 +620,7 @@ function renderAll(){
   renderUpdateTGGroups(); renderDashTGGroups();
 }
 
-function renderDashboard(){
+function renderDashStats(){
   const accs=Object.values(accounts);
   const frozen=accs.filter(a=>a.frozen);
   const totalBal=accs.reduce((s,a)=>s+(Number(a.balance)||0),0);
@@ -611,15 +638,74 @@ function renderDashboard(){
   document.getElementById('d-atm-left').textContent=fmt(totalAtmLeft)+(atmAccs.length?` / ${atmAccs.length} บัญชี`:'');
   document.getElementById('d-qr-left').textContent=fmt(totalQrLeft)+(qrAccs.length?` / ${qrAccs.length} บัญชี`:'');
   document.getElementById('d-sent-cash').textContent=fmt(totalSentCash);
+}
+
+function renderDashboard(){
+  const accs=Object.values(accounts);
+  const frozen=accs.filter(a=>a.frozen);
+  renderDashStats();
   document.getElementById('d-freeze-alerts').innerHTML=frozen.map(a=>`
     <div class="alert alert-freeze">
       <div class="alert-icon">🔒</div>
       <div><div class="alert-title" style="color:var(--red)">${a.name||'—'} — ถูกอายัด</div>
       <div class="alert-sub">${a.bank||''}${a.num?' · ****'+a.num:''}${a.brand?' · '+a.brand:''}</div></div>
     </div>`).join('');
+  renderBrandGroups();
   document.getElementById('d-acc-list').innerHTML=accs.length?accs.map(accMini).join(''):'<div class="empty"><div class="empty-icon">🏦</div>ยังไม่มีบัญชี</div>';
 }
 
+function groupByBrand(accs){
+  const groups={};
+  accs.forEach(a=>{
+    const b=(a.brand||'ไม่ระบุแบรนด์').trim();
+    if(!groups[b])groups[b]=[];
+    groups[b].push(a);
+  });
+  return groups;
+}
+
+function renderBrandGroups(){
+  const accs=Object.values(accounts);
+  const groups=groupByBrand(accs);
+  const el=document.getElementById('d-brand-groups');
+  if(!Object.keys(groups).length){el.innerHTML='';return;}
+  el.innerHTML=Object.keys(groups).map(brand=>{
+    const arr=groups[brand];
+    const totalBal=arr.reduce((s,a)=>s+(Number(a.balance)||0),0);
+    const atmLeft=arr.reduce((s,a)=>s+Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0)),0);
+    const qrLeft=arr.reduce((s,a)=>s+Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0)),0);
+    const sentCash=arr.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
+    const frozenCount=arr.filter(a=>a.frozen).length;
+    const safeId=brand.replace(/[^a-zA-Z0-9ก-๙]/g,'_');
+    return `<div class="brand-group-card">
+      <div class="brand-group-header" onclick="toggleBrandGroup('${safeId}')">
+        <div class="brand-group-title">
+          🏷 ${brand}
+          <span style="font-size:12px;color:var(--muted);font-weight:400">${arr.length} บัญชี${frozenCount?` · <span style="color:var(--red)">🔒${frozenCount}</span>`:''}</span>
+        </div>
+        <span class="brand-group-toggle" id="bgt-${safeId}">▼</span>
+      </div>
+      <div class="brand-group-stats">
+        <div class="brand-stat-box"><div class="brand-stat-lbl">💰 เงินคงเหลือ</div><div class="brand-stat-val" style="color:var(--green)">${fmt(totalBal)}</div></div>
+        <div class="brand-stat-box"><div class="brand-stat-lbl">💳 ATM เหลือ</div><div class="brand-stat-val" style="color:var(--blue)">${fmt(atmLeft)}</div></div>
+        <div class="brand-stat-box"><div class="brand-stat-lbl">📲 QR เหลือ</div><div class="brand-stat-val" style="color:var(--purple)">${fmt(qrLeft)}</div></div>
+        <div class="brand-stat-box" style="grid-column:span 2"><div class="brand-stat-lbl">💸 ส่งกดรวม</div><div class="brand-stat-val" style="color:var(--yellow)">${fmt(sentCash)}</div></div>
+        <div class="brand-stat-box"><div class="brand-stat-lbl">🔒 อายัด</div><div class="brand-stat-val" style="color:${frozenCount?'var(--red)':'var(--muted)'}">${frozenCount}</div></div>
+      </div>
+      <div class="brand-accs" id="brand-accs-${safeId}">
+        ${arr.map(accMini).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleBrandGroup(safeId){
+  const el=document.getElementById('brand-accs-'+safeId);
+  const tog=document.getElementById('bgt-'+safeId);
+  if(!el)return;
+  const open=el.classList.toggle('open');
+  if(tog)tog.textContent=open?'▲':'▼';
+}
 
 function accMini(a){
   const badge=a.frozen?'<span class="badge bg-red">🔒 อายัด</span>':'<span class="badge bg-green">● ปกติ</span>';
@@ -631,6 +717,7 @@ function accMini(a){
         <div class="acc-name">${a.name||'—'}</div>
         ${a.brand?`<div class="acc-brand">🏷 ${a.brand}</div>`:''}
         <div class="acc-num">${a.bank||''}${a.num?' · ****'+a.num:''}</div>
+        ${a.detail?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">📝 ${a.detail}</div>`:''}
       </div>${badge}
     </div>
     <div class="bal-row">
@@ -638,6 +725,35 @@ function accMini(a){
       <div class="bal-box"><div class="bal-label">💳 วงเงินกดเหลือ</div><div class="bal-val" style="color:var(--blue)">${fmt(cashLeft)}</div></div>
     </div>
   </div>`;
+}
+
+// ── ACC FULL (with dirty-check) ──
+function renderAccFullSafe(){
+  const arr=Object.values(accounts);
+  const el=document.getElementById('acc-full');
+  if(!el)return;
+  // For each account, check if its inline panel is open (dirty)
+  arr.forEach(a=>{
+    const panel=document.getElementById('inline-edit-'+a.id);
+    if(panel&&panel.style.display!=='none'){
+      // Panel is open - update only the non-panel parts
+      const card=document.getElementById('acc-card-'+a.id);
+      if(card){
+        // Just update the balance display, not the whole card
+        const balEl=card.querySelector('.dyn-balance');
+        if(balEl)balEl.textContent=fmt(a.balance);
+      }
+    }
+  });
+  // Full re-render only if no panels open
+  if(dirtyEdits.size===0){
+    renderAccFull();
+  }
+}
+
+function renderAccFull(){
+  const arr=Object.values(accounts);
+  document.getElementById('acc-full').innerHTML=arr.length?arr.map(accFull).join(''):'<div class="empty"><div class="empty-icon">🏦</div>ยังไม่มีบัญชี</div>';
 }
 
 function accFull(a){
@@ -658,23 +774,22 @@ function accFull(a){
   const inputStyle='width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:7px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;box-sizing:border-box;';
 
   return (
-    `<div style="background:var(--s2);border:1px solid ${frozen?'rgba(240,79,79,.5)':'var(--bd)'};border-radius:11px;padding:13px;margin-bottom:10px;width:100%;box-sizing:border-box;">` +
+    `<div id="acc-card-${id}" style="background:var(--s2);border:1px solid ${frozen?'rgba(240,79,79,.5)':'var(--bd)'};border-radius:11px;padding:13px;margin-bottom:10px;width:100%;box-sizing:border-box;">` +
 
-    // ── Header ──
     `<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:6px;">` +
       `<div style="min-width:0;flex:1;">` +
         `<div style="font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.name||'—'}</div>` +
         (a.brand?`<div style="font-size:11px;color:var(--purple);font-weight:600;margin-top:1px;">\uD83C\uDFF7 ${a.brand}</div>`:'') +
         `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:1px;">${a.bank||''}${a.num?' \u00B7 ****'+a.num:''}</div>` +
+        (a.detail?`<div style="font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;">\uD83D\uDCDD ${a.detail}</div>`:'') +
       `</div>` +
       badge +
     `</div>` +
 
-    // ── Balance row ──
     `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;width:100%;">` +
       `<div style="background:var(--s3);border-radius:8px;padding:9px 10px;min-width:0;">` +
         `<div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB0 เงินคงเหลือ</div>` +
-        `<div style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--green);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${fmt(a.balance)}</div>` +
+        `<div class="dyn-balance" style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--green);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${fmt(a.balance)}</div>` +
       `</div>` +
       `<div style="background:var(--s3);border-radius:8px;padding:9px 10px;min-width:0;">` +
         `<div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCCA วงเงินบัญชีเหลือ</div>` +
@@ -683,7 +798,6 @@ function accFull(a){
       `</div>` +
     `</div>` +
 
-    // ── Limit row ──
     `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;width:100%;">` +
       `<div style="background:var(--s3);border-radius:8px;padding:8px 10px;min-width:0;">` +
         `<div style="font-size:10px;color:var(--muted);margin-bottom:2px;">\uD83D\uDCB3 วงเงินกด (ATM)</div>` +
@@ -699,15 +813,15 @@ function accFull(a){
       `</div>` +
     `</div>` +
 
-    // ── Inline edit panel (hidden by default) ──
+    // Inline edit panel
     `<div id="inline-edit-${id}" style="display:none;background:var(--s3);border-radius:10px;padding:13px;margin-bottom:10px;width:100%;box-sizing:border-box;">` +
       `<div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:10px;">\u270F\uFE0F แก้ไขยอด</div>` +
       `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;width:100%;">` +
-        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB0 เงินคงเหลือ (${fmt(Number(a.balance)||0)})</div><input type="number" id="ei-bal-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}"></div>` +
-        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB3 วงเงิน ATM (${fmt(cashLim)})</div><input type="number" id="ei-lcash-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}"></div>` +
-        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCF2 วงเงิน QR (${fmt(scanLim)})</div><input type="number" id="ei-lscan-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}"></div>` +
-        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB8 ยอดใช้ ATM (${fmt(cashUsed)})</div><input type="number" id="ei-ucash-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}"></div>` +
-        `<div style="grid-column:span 2;"><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCE4 ยอดโอน QR (${fmt(scanUsed)})</div><input type="number" id="ei-uscan-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}"></div>` +
+        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB0 เงินคงเหลือ (${fmt(Number(a.balance)||0)})</div><input type="number" id="ei-bal-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
+        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB3 วงเงิน ATM (${fmt(cashLim)})</div><input type="number" id="ei-lcash-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
+        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCF2 วงเงิน QR (${fmt(scanLim)})</div><input type="number" id="ei-lscan-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
+        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB8 ยอดใช้ ATM (${fmt(cashUsed)})</div><input type="number" id="ei-ucash-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
+        `<div style="grid-column:span 2;"><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCE4 ยอดโอน QR (${fmt(scanUsed)})</div><input type="number" id="ei-uscan-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
       `</div>` +
       `<input type="text" id="ei-note-${id}" placeholder="หมายเหตุ (ไม่บังคับ)" style="${inputStyle.replace('font-family:var(--mono);','font-family:var(--font);')}margin-bottom:10px;">` +
       `<div style="display:flex;gap:8px;">` +
@@ -716,9 +830,9 @@ function accFull(a){
       `</div>` +
     `</div>` +
 
-    // ── Buttons ──
     `<div style="display:flex;gap:7px;flex-wrap:wrap;width:100%;">` +
       `<button class="btn-sm" onclick="toggleEditPanel('${id}')" style="flex:1;">\u270F\uFE0F แก้ไขยอด</button>` +
+      `<button class="btn-sm" onclick="openEditAcc('${id}')">\uD83D\uDCDD แก้ไขข้อมูล</button>` +
       freezeBtn +
       `<button class="btn-sm danger" onclick="delAcc('${id}')">\uD83D\uDDD1\uFE0F</button>` +
     `</div>` +
@@ -727,15 +841,13 @@ function accFull(a){
   );
 }
 
-function renderAccFull(){
-  const arr=Object.values(accounts);
-  document.getElementById('acc-full').innerHTML=arr.length?arr.map(accFull).join(''):'<div class="empty"><div class="empty-icon">🏦</div>ยังไม่มีบัญชี</div>';
-}
+function markDirty(id){dirtyEdits.add(id);}
+function markClean(id){dirtyEdits.delete(id);}
 
 function renderOnline(){
   const on=Object.values(presence).filter(p=>p.online&&(Date.now()-p.t<90000));
   document.getElementById('online-row').innerHTML=on.length
-    ?on.map(p=>`<div class="online-chip"><div class="online-dot"></div>${p.name}</div>`).join('')
+    ?on.map(p=>`<div class="online-chip"><div class="online-dot"></div>${p.name}${p.shift?' <span style="font-size:10px;color:var(--muted)">(${p.shift==='เช้า'?'☀️':'🌙'})</span>':''}</div>`).join('')
     :'<div style="font-size:12px;color:var(--muted)">ไม่มีใครออนไลน์</div>';
 }
 
@@ -750,7 +862,7 @@ function renderHistory(){
         ${u.amount?`<div class="hist-amount" style="color:var(--green)">${fmt(u.amount)}</div>`:''}
         <div class="hist-detail">${u.detail||''}</div>
         <div style="display:flex;justify-content:space-between;margin-top:4px">
-          <span style="font-size:11px;color:var(--muted)">โดย ${u.reporter||'—'}</span>
+          <span style="font-size:11px;color:var(--muted)">โดย ${u.reporter||'—'}${u.shift?' (กะ'+u.shift+')':''}</span>
           <span class="hist-time">${u.time||''}</span>
         </div>
       </div>`).join('')
@@ -833,7 +945,7 @@ function renderSchedules(){
     :'<div style="font-size:12px;color:var(--muted)">ยังไม่มีกำหนดการ</div>';
 }
 
-// ── SETTINGS ACTIONS ──
+// ── SETTINGS ──
 function saveUserSettings(){
   local.myname=document.getElementById('s-myname').value.trim();
   saveLocal(); document.getElementById('user-chip').textContent=local.myname||'—';
@@ -895,7 +1007,7 @@ async function testAllTG(){
 // ── UPDATE ──
 function pickType(val,el,cls){
   selType=val;
-  document.querySelectorAll('#page-update .chip').forEach(c=>c.className='chip');
+  document.querySelectorAll('#page-update .chip:not([id^="shift-chip"])').forEach(c=>c.className='chip');
   el.classList.add(cls);
 }
 
@@ -904,6 +1016,7 @@ async function submitUpdate(){
   const accId=document.getElementById('ut-acc').value;
   const amount=parseFloat(document.getElementById('ut-amount').value)||0;
   const detail=document.getElementById('ut-detail').value.trim();
+  const shift=selShift||local.shift||'เช้า';
   const reporter=local.myname||'ไม่ระบุ';
   const acc=accounts[accId];
   const btn=document.getElementById('ut-btn');
@@ -912,7 +1025,7 @@ async function submitUpdate(){
   if(selType==='บัญชีถูกอายัด'&&accId){
     await fbSet('accounts/'+accId+'/frozen',true);
     if(local.token){
-      const fLog={type:'บัญชีถูกอายัด',accId,accName:acc?.name||'',accBank:acc?.bank||'',accBrand:acc?.brand||'',amount:0,detail:document.getElementById('ut-detail').value.trim()||`บัญชี ${acc?.name||''} ถูกอายัด`,reporter:local.myname||'—',time:ts(),createdAt:Date.now()};
+      const fLog={type:'บัญชีถูกอายัด',accId,accName:acc?.name||'',accBank:acc?.bank||'',accBrand:acc?.brand||'',amount:0,detail:document.getElementById('ut-detail').value.trim()||`บัญชี ${acc?.name||''} ถูกอายัด`,reporter:local.myname||'—',shift,time:ts(),createdAt:Date.now()};
       const alertGroups=(local.freezeAlertGroups&&local.freezeAlertGroups.length>0)
         ?local.tgGroups.filter(g=>local.freezeAlertGroups.includes(g.id))
         :local.tgGroups||[];
@@ -929,7 +1042,7 @@ async function submitUpdate(){
     await fbSet('accounts/'+accId+'/balance',amount);
   }
 
-  const log={type:selType,accId,accName:acc?.name||'',amount,detail,reporter,time:ts(),createdAt:Date.now()};
+  const log={type:selType,accId,accName:acc?.name||'',accBrand:acc?.brand||'',amount,detail,reporter,shift,time:ts(),createdAt:Date.now()};
   await fbPush('updates',log);
 
   const selGroups=(local.tgGroups||[]).filter(g=>{const cb=document.getElementById('utg-'+g.id);return cb&&cb.checked;});
@@ -938,20 +1051,22 @@ async function submitUpdate(){
   showToast('✅ ส่งอัปเดตแล้ว','ok');
   document.getElementById('ut-amount').value='';
   document.getElementById('ut-detail').value='';
-  document.querySelectorAll('#page-update .chip').forEach(c=>c.className='chip');
+  document.querySelectorAll('#page-update .chip:not([id^="shift-chip"])').forEach(c=>c.className='chip');
   selType=''; btn.disabled=false; btn.textContent='📤 ส่งอัปเดต';
 }
 
 function buildMsg(log){
   const e={'บัญชีถูกอายัด':'🚨','ยอดเงิน':'💰','ส่งกดเงิน':'💳','โอนออก QR':'📲','อื่นๆ':'📌'}[log.type]||'📌';
-  return `${e} *${log.type} — ${cfg.team}*\n\n🏦 *บัญชี:* ${log.accName||'ไม่ระบุ'}\n`
+  const shiftLabel=log.shift==='ดึก'?'🌙 กะดึก':'☀️ กะเช้า';
+  return `${e} *${log.type} — ${cfg.team}*\n\n🏦 *บัญชี:* ${log.accName||'ไม่ระบุ'}${log.accBrand?' ('+log.accBrand+')':''}\n`
     +(log.amount?`💵 *ยอดเงิน:* ${fmt(log.amount)}\n`:'')
     +(log.detail?`📝 *รายละเอียด:* ${log.detail}\n`:'')
-    +`\n👤 *โดย:* ${log.reporter}\n🕐 ${log.time}`
+    +`\n👤 *โดย:* ${log.reporter} | ${shiftLabel}\n🕐 ${log.time}`
     +(log.type==='บัญชีถูกอายัด'?'\n\n⚠️ กรุณาดำเนินการทันที':'');
 }
 
 function buildFreezeMsg(log){
+  const shiftLabel=log.shift==='ดึก'?'🌙 กะดึก':'☀️ กะเช้า';
   return `🚨🚨🚨 *แจ้งด่วน — บัญชีถูกอายัด!*
 *ทีม: ${cfg.team}*
 
@@ -959,7 +1074,7 @@ function buildFreezeMsg(log){
 ${log.accBank?`🏛 *ธนาคาร:* ${log.accBank}
 `:''}${log.accBrand?`🏷 *แบรนด์:* ${log.accBrand}
 `:''}
-👤 *ผู้แจ้ง:* ${log.reporter}
+👤 *ผู้แจ้ง:* ${log.reporter} | ${shiftLabel}
 🕐 ${log.time}
 
 ⚠️ กรุณาดำเนินการทันที!`;
@@ -989,49 +1104,135 @@ async function sendDashToGroup(groupId,note){
   const totalQrLeft=qrAccs.reduce((s,a)=>s+((Number(a.limitScan)||0)-(Number(a.usedScan)||0)),0);
   const totalSentCash=accs.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
   const todayUp=Object.values(updates).filter(u=>u.time&&u.time.includes(todayStr()));
+
+  // Build brand summary
+  const groups=groupByBrand(accs);
+  let brandLines='';
+  Object.keys(groups).forEach(brand=>{
+    const arr=groups[brand];
+    const bBal=arr.reduce((s,a)=>s+(Number(a.balance)||0),0);
+    const bAtm=arr.reduce((s,a)=>s+Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0)),0);
+    const bQr=arr.reduce((s,a)=>s+Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0)),0);
+    const bSent=arr.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
+    const bFrozen=arr.filter(a=>a.frozen).length;
+    brandLines+=`\n━━━━━━━━━━━━━━\n`;
+    brandLines+=`🏷 *${brand}* (${arr.length} บัญชี${bFrozen?` | 🔒${bFrozen}`:' | ✅ปกติ'})\n`;
+    brandLines+=`💰 เงินรวม: ${fmt(bBal)}\n`;
+    brandLines+=`💳 ATM เหลือ: ${fmt(bAtm)}\n`;
+    brandLines+=`📲 QR เหลือ: ${fmt(bQr)}\n`;
+    brandLines+=`💸 ส่งกดแล้ว: ${fmt(bSent)}\n`;
+    // Individual accounts
+    arr.forEach(a=>{
+      const cashL=Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0));
+      const qrL=Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0));
+      brandLines+=`  • ${a.name||'—'} (${a.bank||'?'}) ${a.frozen?'🔒':''}\n    💰${fmt(a.balance)} | ATM ${fmt(cashL)} | QR ${fmt(qrL)}\n`;
+    });
+  });
+
   let msg=`📊 *สรุปภาพรวม — ${cfg.team}*\n_(${note})_\n\n`;
-  msg+=`🏦 *บัญชีทั้งหมด:* ${accs.length} บัญชี\n`;
-  msg+=`💰 *ยอดรวมคงเหลือ:* ${fmt(totalBal)}\n`;
-  msg+=`💳 *วงเงินกด ATM:* ${fmt(totalAtmLeft)} / ${atmAccs.length} บัญชี\n`;
-  msg+=`📲 *วงเงิน QR:* ${fmt(totalQrLeft)} / ${qrAccs.length} บัญชี\n`;
-  msg+=`💸 *ยอดเงินส่งกดรวม:* ${fmt(totalSentCash)}\n`;
-  msg+=`🔒 *บัญชีถูกอายัด:* ${frozen.length} บัญชี\n`;
-  msg+=`📝 *อัปเดตวันนี้:* ${todayUp.length} รายการ\n`;
-  if(frozen.length){msg+='\n⚠️ *บัญชีที่ถูกอายัด:*\n';frozen.forEach(a=>{msg+=`• ${a.name} (${a.bank||''})\n`;});}
-  msg+=`\n🕐 ${ts()}`;
+  msg+=`🏦 บัญชีทั้งหมด: *${accs.length}* บัญชี\n`;
+  msg+=`💰 ยอดรวมคงเหลือ: *${fmt(totalBal)}*\n`;
+  msg+=`💳 วงเงินกด ATM: *${fmt(totalAtmLeft)}*\n`;
+  msg+=`📲 วงเงิน QR: *${fmt(totalQrLeft)}*\n`;
+  msg+=`💸 ยอดส่งกดรวม: *${fmt(totalSentCash)}*\n`;
+  msg+=`🔒 บัญชีถูกอายัด: *${frozen.length}* บัญชี\n`;
+  msg+=`📝 อัปเดตวันนี้: *${todayUp.length}* รายการ\n`;
+  if(frozen.length){msg+='\n⚠️ *บัญชีที่ถูกอายัด:*\n';frozen.forEach(a=>{msg+=`• ${a.name} (${a.bank||'?'}) ${a.brand?'| '+a.brand:''}\n`;});}
+  msg+=brandLines;
+  msg+=`\n━━━━━━━━━━━━━━\n🕐 ${ts()}`;
   await sendTG(groupId,msg);
 }
+
 // ── ACCOUNTS CRUD ──
-function openAddAcc(){document.getElementById('modal-acc').classList.add('open');}
+function openAddAcc(){
+  document.getElementById('modal-acc-title').textContent='เพิ่มบัญชีใหม่';
+  document.getElementById('m-save-btn').textContent='💾 บันทึก';
+  document.getElementById('m-edit-id').value='';
+  ['m-name','m-brand','m-detail','m-num','m-balance','m-lcash','m-lscan'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('m-bank').value='';
+  document.getElementById('modal-acc').classList.add('open');
+}
+
+function openEditAcc(id){
+  const a=accounts[id];
+  if(!a)return;
+  document.getElementById('modal-acc-title').textContent='✏️ แก้ไขข้อมูลบัญชี';
+  document.getElementById('m-save-btn').textContent='💾 บันทึกการแก้ไข';
+  document.getElementById('m-edit-id').value=id;
+  document.getElementById('m-name').value=a.name||'';
+  document.getElementById('m-brand').value=a.brand||'';
+  document.getElementById('m-detail').value=a.detail||'';
+  document.getElementById('m-bank').value=a.bank||'';
+  document.getElementById('m-num').value=a.num||'';
+  document.getElementById('m-balance').value=a.balance||'';
+  document.getElementById('m-lcash').value=a.limitCash||'';
+  document.getElementById('m-lscan').value=a.limitScan||'';
+  document.getElementById('modal-acc').classList.add('open');
+}
+
 async function saveAccount(){
+  const editId=document.getElementById('m-edit-id').value;
   const name=document.getElementById('m-name').value.trim();
   if(!name)return showToast('กรอกชื่อบัญชีด้วย','err');
-  const id='acc_'+Date.now();
-  await fbSet('accounts/'+id,{
-    id,name,brand:document.getElementById('m-brand').value.trim(),
-    bank:document.getElementById('m-bank').value,
-    num:document.getElementById('m-num').value.trim(),
-    balance:parseFloat(document.getElementById('m-balance').value)||0,
-    limitCash:parseFloat(document.getElementById('m-lcash').value)||0,
-    limitScan:parseFloat(document.getElementById('m-lscan').value)||0,
-    usedCash:0,usedScan:0,frozen:false,createdAt:Date.now()
-  });
-  const accData={id,name,brand:document.getElementById('m-brand').value.trim(),bank:document.getElementById('m-bank').value};
-  const addLog={type:'เพิ่มบัญชี',accId:id,accName:name,accBank:accData.bank,accBrand:accData.brand,amount:parseFloat(document.getElementById('m-balance').value)||0,detail:`เพิ่มบัญชีใหม่: ${name} — ${accData.bank||''}${accData.brand?' ('+accData.brand+')':''}`,reporter:local.myname||'ระบบ',time:ts(),createdAt:Date.now()};
-  await fbPush('updates',addLog);
+
+  if(editId){
+    // Edit existing
+    const a=accounts[editId]||{};
+    const newBrand=document.getElementById('m-brand').value.trim();
+    const oldBrand=a.brand||'';
+    const updates2={
+      name,
+      brand:newBrand,
+      detail:document.getElementById('m-detail').value.trim(),
+      bank:document.getElementById('m-bank').value,
+      num:document.getElementById('m-num').value.trim(),
+    };
+    const bal=document.getElementById('m-balance').value;
+    const lcash=document.getElementById('m-lcash').value;
+    const lscan=document.getElementById('m-lscan').value;
+    if(bal!=='')updates2.balance=parseFloat(bal)||0;
+    if(lcash!=='')updates2.limitCash=parseFloat(lcash)||0;
+    if(lscan!=='')updates2.limitScan=parseFloat(lscan)||0;
+    for(const[k,v]of Object.entries(updates2)){
+      await fbSet('accounts/'+editId+'/'+k,v);
+    }
+    const changes=[];
+    if(name!==a.name)changes.push(`ชื่อ: ${a.name}→${name}`);
+    if(newBrand!==oldBrand)changes.push(`แบรนด์: ${oldBrand||'ไม่ระบุ'}→${newBrand||'ไม่ระบุ'}`);
+    const editLog={type:'แก้ไขยอด',accId:editId,accName:name,amount:0,detail:'แก้ไขข้อมูลบัญชี'+(changes.length?': '+changes.join(' | '):''),reporter:local.myname||'ระบบ',shift:local.shift||'เช้า',time:ts(),createdAt:Date.now()};
+    await fbPush('updates',editLog);
+    showToast('✅ แก้ไขข้อมูลแล้ว','ok');
+  } else {
+    // Add new
+    const id='acc_'+Date.now();
+    await fbSet('accounts/'+id,{
+      id,name,brand:document.getElementById('m-brand').value.trim(),
+      detail:document.getElementById('m-detail').value.trim(),
+      bank:document.getElementById('m-bank').value,
+      num:document.getElementById('m-num').value.trim(),
+      balance:parseFloat(document.getElementById('m-balance').value)||0,
+      limitCash:parseFloat(document.getElementById('m-lcash').value)||0,
+      limitScan:parseFloat(document.getElementById('m-lscan').value)||0,
+      usedCash:0,usedScan:0,frozen:false,createdAt:Date.now()
+    });
+    const accData={id,name,brand:document.getElementById('m-brand').value.trim(),bank:document.getElementById('m-bank').value};
+    const addLog={type:'เพิ่มบัญชี',accId:id,accName:name,accBank:accData.bank,accBrand:accData.brand,amount:parseFloat(document.getElementById('m-balance').value)||0,detail:`เพิ่มบัญชีใหม่: ${name} — ${accData.bank||''}${accData.brand?' ('+accData.brand+')':''}`,reporter:local.myname||'ระบบ',shift:local.shift||'เช้า',time:ts(),createdAt:Date.now()};
+    await fbPush('updates',addLog);
+    showToast('✅ เพิ่มบัญชีแล้ว','ok');
+  }
   closeModal('modal-acc');
-  ['m-name','m-brand','m-bank','m-num','m-balance','m-lcash','m-lscan'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  showToast('✅ เพิ่มบัญชีแล้ว','ok');
 }
+
 async function delAcc(id){
   if(!confirm('ลบบัญชีนี้?'))return;
   await fbDel('accounts/'+id); showToast('🗑️ ลบแล้ว','');
 }
+
 async function setFreeze(id,val){
   await fbSet('accounts/'+id+'/frozen',val);
   if(val){
     const a=accounts[id];
-    const log={type:'บัญชีถูกอายัด',accId:id,accName:a?.name||'',accBank:a?.bank||'',accBrand:a?.brand||'',amount:0,detail:`🚨 บัญชี ${a?.name||''} (${a?.bank||''}) ถูกอายัด`,reporter:local.myname||'—',time:ts(),createdAt:Date.now()};
+    const log={type:'บัญชีถูกอายัด',accId:id,accName:a?.name||'',accBank:a?.bank||'',accBrand:a?.brand||'',amount:0,detail:`🚨 บัญชี ${a?.name||''} (${a?.bank||''}) ถูกอายัด`,reporter:local.myname||'—',shift:local.shift||'เช้า',time:ts(),createdAt:Date.now()};
     await fbPush('updates',log);
     if(local.token){
       const alertGroups=(local.freezeAlertGroups&&local.freezeAlertGroups.length>0)
@@ -1040,7 +1241,7 @@ async function setFreeze(id,val){
       for(const g of alertGroups)await sendTG(g.id,buildFreezeMsg(log));
     }
   }
-  showToast(val?'🔒 แจ้อายัดแล้ว':'🔓 ปลดอายัดแล้ว',val?'warn':'ok');
+  showToast(val?'🔒 แจ้งอายัดแล้ว':'🔓 ปลดอายัดแล้ว',val?'warn':'ok');
 }
 
 function toggleEditPanel(id){
@@ -1048,8 +1249,10 @@ function toggleEditPanel(id){
   if(!panel)return;
   const isOpen=panel.style.display!=='none';
   panel.style.display=isOpen?'none':'block';
-  if(!isOpen){
-    // Clear inputs when opening
+  if(isOpen){
+    markClean(id);
+  } else {
+    markDirty(id);
     ['ei-bal-','ei-lcash-','ei-lscan-','ei-ucash-','ei-uscan-','ei-note-'].forEach(prefix=>{
       const el=document.getElementById(prefix+id);
       if(el)el.value='';
@@ -1085,13 +1288,14 @@ async function saveInlineEdit(id){
   }
   const detail=changes.map(c=>`${c.label}: ${fmt(c.cur)} → ${fmt(c.newVal)}`).join(' | ')+(note?' | หมายเหตุ: '+note:'');
   const editLog={
-    type:'แก้ไขยอด',
-    accId:id,accName:a?.name||'',
+    type:'แก้ไขยอด',accId:id,accName:a?.name||'',
     amount:changes.find(c=>c.fbPath==='balance')?.newVal||0,
-    detail,reporter:local.myname||'ระบบ',
+    detail,reporter:local.myname||'ระบบ',shift:local.shift||'เช้า',
     time:ts(),createdAt:Date.now()
   };
   await fbPush('updates',editLog);
+  markClean(id);
+  // Now safe to re-render this card
   toggleEditPanel(id);
   if(saveBtn){saveBtn.disabled=false;saveBtn.textContent='💾 บันทึก';}
   showToast('✅ บันทึกแล้ว','ok');
@@ -1113,6 +1317,26 @@ function showToast(msg,type){
   t.textContent=msg; t.className='toast show '+(type||'');
   clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3000);
 }
+
+// Missing CSS classes referenced in accMini
+document.head.insertAdjacentHTML('beforeend',`<style>
+.acc-card{background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:13px;margin-bottom:10px;width:100%;min-width:0;box-sizing:border-box;}
+.acc-card.frozen{border-color:rgba(240,79,79,.5);background:rgba(240,79,79,.04);}
+.acc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:6px;width:100%;min-width:0;}
+.acc-name{font-weight:700;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.acc-brand{font-size:11px;color:var(--purple);font-weight:600;margin-top:1px;}
+.acc-num{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:1px;}
+.badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.bg-green{background:rgba(45,214,123,.15);color:var(--green);}
+.bg-red{background:rgba(240,79,79,.2);color:var(--red);}
+.bg-yellow{background:rgba(245,183,49,.15);color:var(--yellow);}
+.bg-blue{background:rgba(74,143,255,.15);color:var(--blue);}
+.bg-purple{background:rgba(155,108,255,.15);color:var(--purple);}
+.bal-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;width:100%;min-width:0;}
+.bal-box{background:var(--s3);border-radius:8px;padding:9px 10px;min-width:0;overflow:hidden;}
+.bal-label{font-size:10px;color:var(--muted);margin-bottom:3px;}
+.bal-val{font-family:var(--mono);font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+</style>`);
 
 window.addEventListener('load',()=>{if(cfg&&cfg.url)launchApp();});
 </script>

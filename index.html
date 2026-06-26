@@ -271,6 +271,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="stat"><div class="stat-val" id="d-qr-left" style="color:var(--purple)">—</div><div class="stat-lbl">📲 วงเงิน QR รวม</div></div>
       <div class="stat" style="grid-column:span 2"><div class="stat-val" id="d-sent-cash" style="color:var(--yellow);font-size:16px">—</div><div class="stat-lbl">💸 ยอดเงินส่งกดรวมทุกบัญชี</div></div>
     </div>
+    <div class="stat-grid" style="margin-top:-4px;margin-bottom:12px;">
+      <div class="stat"><div class="stat-val" id="d-shift-a" style="color:var(--yellow)">—</div><div class="stat-lbl">🌅 บัญชีกะ A</div></div>
+      <div class="stat"><div class="stat-val" id="d-shift-b" style="color:var(--purple)">—</div><div class="stat-lbl">🌙 บัญชีกะ B</div></div>
+    </div>
     <div id="d-freeze-alerts"></div>
     <div class="tg-send-box">
       <div class="tg-send-title">📨 ส่งสรุปเข้า Telegram</div>
@@ -324,6 +328,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <button class="btn btn-primary" onclick="saveUserSettings()">💾 บันทึก</button>
     </div>
     <div class="card">
+      <div class="s-sec">จัดการแบรนด์</div>
+      <div id="brand-list-settings"><div style="font-size:12px;color:var(--muted)">ยังไม่มีแบรนด์</div></div>
+      <div class="divider"></div>
+      <div class="field"><label>ชื่อแบรนด์ใหม่</label><input id="s-brand-name" placeholder="เช่น KK, TDD, Alpha"></div>
+      <button class="btn btn-green" onclick="addBrand()">➕ เพิ่มแบรนด์</button>
+    </div>
+    <div class="card">
       <div class="s-sec">Telegram Bot</div>
       <div class="field"><label>Bot Token</label><input id="s-token" placeholder="1234567890:ABCdef..." style="font-family:var(--mono);font-size:12px;"></div>
       <div class="hint" style="margin-bottom:12px">สร้าง Bot ที่ <a href="https://t.me/BotFather" target="_blank">@BotFather</a> → /newbot</div>
@@ -371,7 +382,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="modal-hd"><div class="modal-title" id="modal-acc-title">เพิ่มบัญชีใหม่</div><button class="modal-close" onclick="closeModal('modal-acc')">✕</button></div>
     <div class="field-row">
       <div class="field"><label>ชื่อเจ้าของบัญชี</label><input id="m-name" placeholder="ชื่อ-สกุล"></div>
-      <div class="field"><label>แบรนด์ / ทีม</label><input id="m-brand" placeholder="เช่น KK, TDD"></div>
+      <div class="field">
+        <label>แบรนด์ / ทีม</label>
+        <div style="display:flex;gap:6px;">
+          <select id="m-brand-select" style="flex:1;background:var(--bg);border:1px solid var(--bd2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:14px;padding:10px 12px;outline:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7799'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;" onchange="syncBrandInput(this.value)">
+            <option value="">— เลือกแบรนด์ —</option>
+          </select>
+          <input id="m-brand" placeholder="หรือพิมพ์เอง" style="flex:1;background:var(--bg);border:1px solid var(--bd2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:14px;padding:10px 12px;outline:none;" oninput="syncBrandSelect(this.value)">
+        </div>
+      </div>
     </div>
     <div class="field"><label>รายละเอียดเพิ่มเติม</label><textarea id="m-detail" placeholder="หมายเหตุ, รายละเอียดพิเศษ, ข้อมูลสำคัญ..."></textarea></div>
     <div class="field">
@@ -388,7 +407,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         <select id="m-bank">
           <option value="">— เลือก —</option>
           <option>KBANK</option><option>SCB</option><option>KTB</option>
-          <option>BBL</option><option>TTB</option><option>ออมสิน</option><option>ธ.ก.ส.</option><option>อื่นๆ</option>
+          <option>BBL</option><option>BAY</option><option>TTB</option>
+          <option>KKP</option><option>TISCO</option><option>CIMBT</option>
+          <option>LH Bank</option><option>ICBC</option>
+          <option>ออมสิน</option><option>ธ.ก.ส.</option><option>อาคารสงเคราะห์</option>
+          <option>ทรูมันนี่วอลเล็ท</option><option>พร้อมเพย์</option><option>อื่นๆ</option>
         </select>
       </div>
       <div class="field"><label>เลขท้าย 4 หลัก</label><input id="m-num" maxlength="4" placeholder="xxxx" style="font-family:var(--mono)"></div>
@@ -475,7 +498,7 @@ function launchApp(){
   document.getElementById('s-token').value=local.token||'';
   document.getElementById('s-db-url').textContent=DB;
   updateShiftDisplay();
-  renderTGGroups(); renderSchedules(); renderFreezeAlertGroups();
+  renderTGGroups(); renderSchedules(); renderFreezeAlertGroups(); renderBrandSettings();
   startListeners(); startClock(); startSchChecker();
   setPresence(true);
   window.addEventListener('beforeunload',()=>setPresence(false));
@@ -495,6 +518,59 @@ function saveName(){
 }
 
 function saveLocal(){localStorage.setItem('fw_local3',JSON.stringify(local));}
+
+// ── BRAND MANAGEMENT ──
+function renderBrandSettings(){
+  const el=document.getElementById('brand-list-settings');
+  if(!el)return;
+  const brands=local.brands||[];
+  el.innerHTML=brands.length
+    ?brands.map((b,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:8px 12px;margin-bottom:6px;">
+        <span style="font-weight:600;font-size:13px;">🏷 ${b}</span>
+        <button class="btn-sm danger" onclick="removeBrand(${i})">🗑️</button>
+      </div>`).join('')
+    :'<div style="font-size:12px;color:var(--muted)">ยังไม่มีแบรนด์ — เพิ่มแบรนด์เพื่อใช้เลือกตอนสร้างบัญชี</div>';
+  // Update brand selects in modal
+  refreshBrandSelect();
+}
+
+function refreshBrandSelect(){
+  const sel=document.getElementById('m-brand-select');
+  if(!sel)return;
+  const brands=local.brands||[];
+  const cur=document.getElementById('m-brand')?.value||'';
+  sel.innerHTML='<option value="">— เลือกแบรนด์ —</option>'
+    +brands.map(b=>`<option value="${b}"${b===cur?' selected':''}>${b}</option>`).join('');
+}
+
+function syncBrandInput(val){
+  const inp=document.getElementById('m-brand');
+  if(inp&&val)inp.value=val;
+}
+
+function syncBrandSelect(val){
+  const sel=document.getElementById('m-brand-select');
+  if(!sel)return;
+  // Try to match option
+  const opt=[...sel.options].find(o=>o.value===val);
+  sel.value=opt?val:'';
+}
+
+function addBrand(){
+  const name=document.getElementById('s-brand-name').value.trim();
+  if(!name)return showToast('กรอกชื่อแบรนด์','err');
+  if(!local.brands)local.brands=[];
+  if(local.brands.includes(name))return showToast('มีแบรนด์นี้แล้ว','warn');
+  local.brands.push(name); saveLocal();
+  document.getElementById('s-brand-name').value='';
+  renderBrandSettings();
+  showToast('✅ เพิ่มแบรนด์แล้ว','ok');
+}
+
+function removeBrand(i){
+  local.brands.splice(i,1); saveLocal(); renderBrandSettings();
+  showToast('🗑️ ลบแบรนด์แล้ว','');
+}
 
 // ── SHIFT ──
 function pickShift(val,el,cls){
@@ -687,6 +763,12 @@ function renderDashStats(){
   document.getElementById('d-atm-left').textContent=fmt(totalAtmLeft)+(atmAccs.length?` / ${atmAccs.length} บัญชี`:'');
   document.getElementById('d-qr-left').textContent=fmt(totalQrLeft)+(qrAccs.length?` / ${qrAccs.length} บัญชี`:'');
   document.getElementById('d-sent-cash').textContent=fmt(totalSentCash);
+  const shiftACount=accs.filter(a=>a.accShift==='A').length;
+  const shiftBCount=accs.filter(a=>a.accShift==='B').length;
+  const saEl=document.getElementById('d-shift-a');
+  const sbEl=document.getElementById('d-shift-b');
+  if(saEl)saEl.textContent=shiftACount+' บัญชี';
+  if(sbEl)sbEl.textContent=shiftBCount+' บัญชี';
 }
 
 function renderDashboard(){
@@ -725,6 +807,8 @@ function renderBrandGroups(){
     const qrLeft=arr.reduce((s,a)=>s+Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0)),0);
     const sentCash=arr.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
     const frozenCount=arr.filter(a=>a.frozen).length;
+    const shiftAC=arr.filter(a=>a.accShift==='A').length;
+    const shiftBC=arr.filter(a=>a.accShift==='B').length;
     const safeId=brand.replace(/[^a-zA-Z0-9ก-๙]/g,'_');
     return `<div class="brand-group-card">
       <div class="brand-group-header" onclick="toggleBrandGroup('${safeId}')">
@@ -740,6 +824,8 @@ function renderBrandGroups(){
         <div class="brand-stat-box"><div class="brand-stat-lbl">📲 QR เหลือ</div><div class="brand-stat-val" style="color:var(--purple)">${fmt(qrLeft)}</div></div>
         <div class="brand-stat-box" style="grid-column:span 2"><div class="brand-stat-lbl">💸 ส่งกดรวม</div><div class="brand-stat-val" style="color:var(--yellow)">${fmt(sentCash)}</div></div>
         <div class="brand-stat-box"><div class="brand-stat-lbl">🔒 อายัด</div><div class="brand-stat-val" style="color:${frozenCount?'var(--red)':'var(--muted)'}">${frozenCount}</div></div>
+        <div class="brand-stat-box"><div class="brand-stat-lbl">🌅 กะ A</div><div class="brand-stat-val" style="color:var(--yellow)">${shiftAC}</div></div>
+        <div class="brand-stat-box"><div class="brand-stat-lbl">🌙 กะ B</div><div class="brand-stat-val" style="color:var(--purple)">${shiftBC}</div></div>
       </div>
       <div class="brand-accs" id="brand-accs-${safeId}">
         ${arr.map(accMini).join('')}
@@ -1189,7 +1275,9 @@ async function sendDashToGroup(groupId,note){
     const bSent=arr.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
     const bFrozen=arr.filter(a=>a.frozen).length;
     brandLines+=`\n━━━━━━━━━━━━━━\n`;
-    brandLines+=`🏷 *${brand}* (${arr.length} บัญชี${bFrozen?` | 🔒${bFrozen}`:' | ✅ปกติ'})\n`;
+    const bShiftA=arr.filter(a=>a.accShift==='A').length;
+    const bShiftB=arr.filter(a=>a.accShift==='B').length;
+    brandLines+=`🏷 *${brand}* (${arr.length} บัญชี${bFrozen?` | 🔒${bFrozen}`:' | ✅ปกติ'}${(bShiftA||bShiftB)?` | 🌅A:${bShiftA} 🌙B:${bShiftB}`:''})`+`\n`;
     brandLines+=`💰 เงินรวม: ${fmt(bBal)}\n`;
     brandLines+=`💳 ATM เหลือ: ${fmt(bAtm)}\n`;
     brandLines+=`📲 QR เหลือ: ${fmt(bQr)}\n`;
@@ -1203,8 +1291,12 @@ async function sendDashToGroup(groupId,note){
     });
   });
 
+  const tgShiftA=accs.filter(a=>a.accShift==='A').length;
+  const tgShiftB=accs.filter(a=>a.accShift==='B').length;
   let msg=`📊 *สรุปภาพรวม — ${cfg.team}*\n_(${note})_\n\n`;
-  msg+=`🏦 บัญชีทั้งหมด: *${accs.length}* บัญชี\n`;
+  msg+=`🏦 บัญชีทั้งหมด: *${accs.length}* บัญชี`;
+  if(tgShiftA||tgShiftB) msg+=` (🌅กะA: ${tgShiftA} | 🌙กะB: ${tgShiftB})`;
+  msg+=`\n`;
   msg+=`💰 ยอดรวมคงเหลือ: *${fmt(totalBal)}*\n`;
   msg+=`💳 วงเงินกด ATM: *${fmt(totalAtmLeft)}*\n`;
   msg+=`📲 วงเงิน QR: *${fmt(totalQrLeft)}*\n`;
@@ -1225,6 +1317,8 @@ function openAddAcc(){
   ['m-name','m-brand','m-detail','m-num','m-balance','m-lcash','m-lscan'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('m-bank').value='';
   setModalShift('');
+  refreshBrandSelect();
+  document.getElementById('m-brand').value='';
   document.getElementById('modal-acc').classList.add('open');
 }
 
@@ -1243,6 +1337,11 @@ function openEditAcc(id){
   document.getElementById('m-lcash').value=a.limitCash||'';
   document.getElementById('m-lscan').value=a.limitScan||'';
   setModalShift(a.accShift||'');
+  document.getElementById('m-brand').value=a.brand||'';
+  refreshBrandSelect();
+  // set select to match brand
+  const bSel=document.getElementById('m-brand-select');
+  if(bSel){const opt=[...bSel.options].find(o=>o.value===(a.brand||''));bSel.value=opt?a.brand:'';}
   document.getElementById('modal-acc').classList.add('open');
 }
 

@@ -374,6 +374,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="field"><label>แบรนด์ / ทีม</label><input id="m-brand" placeholder="เช่น KK, TDD"></div>
     </div>
     <div class="field"><label>รายละเอียดเพิ่มเติม</label><textarea id="m-detail" placeholder="หมายเหตุ, รายละเอียดพิเศษ, ข้อมูลสำคัญ..."></textarea></div>
+    <div class="field">
+      <label>กะประจำบัญชี</label>
+      <div class="chip-row">
+        <div class="chip" id="m-shift-a" onclick="pickAccShift('A',this)">🌅 กะ A</div>
+        <div class="chip" id="m-shift-b" onclick="pickAccShift('B',this)">🌙 กะ B</div>
+        <div class="chip" id="m-shift-none" onclick="pickAccShift('',this)">— ไม่ระบุ</div>
+      </div>
+      <input type="hidden" id="m-shift-val" value="">
+    </div>
     <div class="field-row">
       <div class="field"><label>ธนาคาร</label>
         <select id="m-bank">
@@ -758,6 +767,7 @@ function accMini(a){
         ${a.brand?`<div class="acc-brand">🏷 ${a.brand}</div>`:''}
         <div class="acc-num">${a.bank||''}${a.num?' · ****'+a.num:''}</div>
         ${a.detail?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">📝 ${a.detail}</div>`:''}
+        ${a.accShift?`<div style="display:inline-block;margin-top:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;${a.accShift==='A'?'background:rgba(245,183,49,.15);color:var(--yellow)':'background:rgba(155,108,255,.15);color:var(--purple)'}">${a.accShift==='A'?'🌅 กะ A':'🌙 กะ B'}</div>`:''}
       </div>${badge}
     </div>
     <div class="bal-row">
@@ -822,6 +832,7 @@ function accFull(a){
         (a.brand?`<div style="font-size:11px;color:var(--purple);font-weight:600;margin-top:1px;">\uD83C\uDFF7 ${a.brand}</div>`:'') +
         `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:1px;">${a.bank||''}${a.num?' \u00B7 ****'+a.num:''}</div>` +
         (a.detail?`<div style="font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;">\uD83D\uDCDD ${a.detail}</div>`:'') +
+        (a.accShift?`<div style="display:inline-block;margin-top:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;${a.accShift==='A'?'background:rgba(245,183,49,.15);color:var(--yellow)':'background:rgba(155,108,255,.15);color:var(--purple)'}">${a.accShift==='A'?'\uD83C\uDF05 \uD83D\uDD22\uFE0F\u0E01\u0E30 A':'\uD83C\uDF19 \uD83D\uDD22\uFE0F\u0E01\u0E30 B'}</div>`:'') +
       `</div>` +
       badge +
     `</div>` +
@@ -940,14 +951,14 @@ function renderTGGroups(){
 function renderUpdateTGGroups(){
   const el=document.getElementById('ut-tg-groups');
   el.innerHTML=(local.tgGroups||[]).length
-    ?local.tgGroups.map(g=>`<div class="tg-group-check"><input type="checkbox" id="utg-${g.id}" value="${g.id}"><label for="utg-${g.id}" style="font-size:13px;cursor:pointer">${g.name}</label></div>`).join('')
+    ?local.tgGroups.map((g,i)=>`<div class="tg-group-check"><input type="checkbox" id="utg-idx-${i}" data-gid="${g.id}" checked><label for="utg-idx-${i}" style="font-size:13px;cursor:pointer">${g.name}</label></div>`).join('')
     :'<div style="font-size:12px;color:var(--muted)">ยังไม่มีกลุ่ม — ตั้งค่าในหน้า ⚙️</div>';
 }
 
 function renderDashTGGroups(){
   const el=document.getElementById('dash-tg-groups');
   el.innerHTML=(local.tgGroups||[]).length
-    ?local.tgGroups.map(g=>`<div class="tg-group-check"><input type="checkbox" id="dtg-${g.id}" value="${g.id}" checked><label for="dtg-${g.id}" style="font-size:13px;cursor:pointer">${g.name}</label></div>`).join('')
+    ?local.tgGroups.map((g,i)=>`<div class="tg-group-check"><input type="checkbox" id="dtg-idx-${i}" data-gid="${g.id}" checked><label for="dtg-idx-${i}" style="font-size:13px;cursor:pointer">${g.name}</label></div>`).join('')
     :'<div style="font-size:12px;color:var(--muted)">ยังไม่มีกลุ่ม — ตั้งค่าในหน้า ⚙️</div>';
 }
 
@@ -1051,6 +1062,28 @@ function pickType(val,el,cls){
   el.classList.add(cls);
 }
 
+function pickAccShift(val,el){
+  document.getElementById('m-shift-val').value=val;
+  ['m-shift-a','m-shift-b','m-shift-none'].forEach(id=>{
+    const e=document.getElementById(id);
+    if(e) e.className='chip';
+  });
+  if(val==='A') el.className='chip sel-yellow';
+  else if(val==='B') el.className='chip sel-purple';
+  else el.className='chip sel-blue';
+}
+
+function setModalShift(val){
+  document.getElementById('m-shift-val').value=val||'';
+  ['m-shift-a','m-shift-b','m-shift-none'].forEach(id=>{
+    const e=document.getElementById(id);
+    if(e) e.className='chip';
+  });
+  if(val==='A'){const e=document.getElementById('m-shift-a');if(e)e.className='chip sel-yellow';}
+  else if(val==='B'){const e=document.getElementById('m-shift-b');if(e)e.className='chip sel-purple';}
+  else{const e=document.getElementById('m-shift-none');if(e)e.className='chip sel-blue';}
+}
+
 async function submitUpdate(){
   if(!selType)return showToast('เลือกประเภทก่อน','err');
   const accId=document.getElementById('ut-acc').value;
@@ -1085,8 +1118,8 @@ async function submitUpdate(){
   const log={type:selType,accId,accName:acc?.name||'',accBrand:acc?.brand||'',amount,detail,reporter,shift,time:ts(),createdAt:Date.now()};
   await fbPush('updates',log);
 
-  const selGroups=(local.tgGroups||[]).filter(g=>{const cb=document.getElementById('utg-'+g.id);return cb&&cb.checked;});
-  for(const g of selGroups) await sendTG(g.id,buildMsg(log));
+  const selGroupIds=[...document.querySelectorAll('#ut-tg-groups input[type=checkbox]:checked')].map(cb=>cb.getAttribute('data-gid'));
+  for(const gid of selGroupIds) await sendTG(gid,buildMsg(log));
 
   showToast('✅ ส่งอัปเดตแล้ว','ok');
   document.getElementById('ut-amount').value='';
@@ -1127,10 +1160,10 @@ async function sendTG(chatId,msg){
 }
 
 async function sendDashNow(){
-  const sel=(local.tgGroups||[]).filter(g=>{const cb=document.getElementById('dtg-'+g.id);return cb&&cb.checked;});
-  if(!sel.length)return showToast('เลือกกลุ่มก่อน','err');
+  const checkedIds=[...document.querySelectorAll('#dash-tg-groups input[type=checkbox]:checked')].map(cb=>cb.getAttribute('data-gid'));
+  if(!checkedIds.length)return showToast('เลือกกลุ่มก่อน','err');
   if(!local.token)return showToast('ตั้งค่า Bot Token ก่อน','err');
-  for(const g of sel) await sendDashToGroup(g.id,'📤 ส่งด้วยตนเอง');
+  for(const gid of checkedIds) await sendDashToGroup(gid,'📤 ส่งด้วยตนเอง');
   showToast('✅ ส่งสรุปแล้ว','ok');
 }
 
@@ -1165,7 +1198,8 @@ async function sendDashToGroup(groupId,note){
     arr.forEach(a=>{
       const cashL=Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0));
       const qrL=Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0));
-      brandLines+=`  • ${a.name||'—'} (${a.bank||'?'}) ${a.frozen?'🔒':''}\n    💰${fmt(a.balance)} | ATM ${fmt(cashL)} | QR ${fmt(qrL)}\n`;
+      const shiftTag=a.accShift?` [กะ${a.accShift}]`:'';
+      brandLines+=`  • ${a.name||'—'}${shiftTag} (${a.bank||'?'}) ${a.frozen?'🔒':''}\n    💰${fmt(a.balance)} | ATM ${fmt(cashL)} | QR ${fmt(qrL)}\n`;
     });
   });
 
@@ -1190,6 +1224,7 @@ function openAddAcc(){
   document.getElementById('m-edit-id').value='';
   ['m-name','m-brand','m-detail','m-num','m-balance','m-lcash','m-lscan'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('m-bank').value='';
+  setModalShift('');
   document.getElementById('modal-acc').classList.add('open');
 }
 
@@ -1207,6 +1242,7 @@ function openEditAcc(id){
   document.getElementById('m-balance').value=a.balance||'';
   document.getElementById('m-lcash').value=a.limitCash||'';
   document.getElementById('m-lscan').value=a.limitScan||'';
+  setModalShift(a.accShift||'');
   document.getElementById('modal-acc').classList.add('open');
 }
 
@@ -1220,12 +1256,14 @@ async function saveAccount(){
     const a=accounts[editId]||{};
     const newBrand=document.getElementById('m-brand').value.trim();
     const oldBrand=a.brand||'';
+    const newAccShift=document.getElementById('m-shift-val').value;
     const updates2={
       name,
       brand:newBrand,
       detail:document.getElementById('m-detail').value.trim(),
       bank:document.getElementById('m-bank').value,
       num:document.getElementById('m-num').value.trim(),
+      accShift:newAccShift,
     };
     const bal=document.getElementById('m-balance').value;
     const lcash=document.getElementById('m-lcash').value;
@@ -1250,6 +1288,7 @@ async function saveAccount(){
       detail:document.getElementById('m-detail').value.trim(),
       bank:document.getElementById('m-bank').value,
       num:document.getElementById('m-num').value.trim(),
+      accShift:document.getElementById('m-shift-val').value,
       balance:parseFloat(document.getElementById('m-balance').value)||0,
       limitCash:parseFloat(document.getElementById('m-lcash').value)||0,
       limitScan:parseFloat(document.getElementById('m-lscan').value)||0,

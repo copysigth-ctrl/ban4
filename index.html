@@ -1262,51 +1262,38 @@ async function sendDashToGroup(groupId,note){
   const qrAccs=accs.filter(a=>Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0))>0);
   const totalQrLeft=qrAccs.reduce((s,a)=>s+((Number(a.limitScan)||0)-(Number(a.usedScan)||0)),0);
   const totalSentCash=accs.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
-  const todayUp=Object.values(updates).filter(u=>u.time&&u.time.includes(todayStr()));
-
-  // Build brand summary
-  const groups=groupByBrand(accs);
-  let brandLines='';
-  Object.keys(groups).forEach(brand=>{
-    const arr=groups[brand];
-    const bBal=arr.reduce((s,a)=>s+(Number(a.balance)||0),0);
-    const bAtm=arr.reduce((s,a)=>s+Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0)),0);
-    const bQr=arr.reduce((s,a)=>s+Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0)),0);
-    const bSent=arr.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
-    const bFrozen=arr.filter(a=>a.frozen).length;
-    brandLines+=`\n━━━━━━━━━━━━━━\n`;
-    const bShiftA=arr.filter(a=>a.accShift==='A').length;
-    const bShiftB=arr.filter(a=>a.accShift==='B').length;
-    brandLines+=`🏷 *${brand}* (${arr.length} บัญชี${bFrozen?` | 🔒${bFrozen}`:' | ✅ปกติ'}${(bShiftA||bShiftB)?` | 🌅A:${bShiftA} 🌙B:${bShiftB}`:''})`+`\n`;
-    brandLines+=`💰 เงินรวม: ${fmt(bBal)}\n`;
-    brandLines+=`💳 ATM เหลือ: ${fmt(bAtm)}\n`;
-    brandLines+=`📲 QR เหลือ: ${fmt(bQr)}\n`;
-    brandLines+=`💸 ส่งกดแล้ว: ${fmt(bSent)}\n`;
-    // Individual accounts (bank + shift only, no name)
-    arr.forEach(a=>{
-      const cashL=Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0));
-      const qrL=Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0));
-      const shiftTag=a.accShift?` กะ${a.accShift}`:'';
-      const frozenTag=a.frozen?' 🔒':'';
-      brandLines+=`  • ${a.bank||'?'}${shiftTag}${frozenTag} | 💰${fmt(a.balance)} | ATM ${fmt(cashL)} | QR ${fmt(qrL)}\n`;
-    });
-  });
-
   const tgShiftA=accs.filter(a=>a.accShift==='A').length;
   const tgShiftB=accs.filter(a=>a.accShift==='B').length;
-  let msg=`📊 *สรุปภาพรวม — ${cfg.team}*\n_(${note})_\n\n`;
-  msg+=`🏦 บัญชีทั้งหมด: *${accs.length}* บัญชี`;
-  if(tgShiftA||tgShiftB) msg+=` (🌅กะA: ${tgShiftA} | 🌙กะB: ${tgShiftB})`;
-  msg+=`\n`;
-  msg+=`💰 ยอดรวมคงเหลือ: *${fmt(totalBal)}*\n`;
-  msg+=`💳 วงเงินกด ATM: *${fmt(totalAtmLeft)}*\n`;
-  msg+=`📲 วงเงิน QR: *${fmt(totalQrLeft)}*\n`;
-  msg+=`💸 ยอดส่งกดรวม: *${fmt(totalSentCash)}*\n`;
-  msg+=`🔒 บัญชีถูกอายัด: *${frozen.length}* บัญชี\n`;
-  msg+=`📝 อัปเดตวันนี้: *${todayUp.length}* รายการ\n`;
-  if(frozen.length){msg+='\n⚠️ *บัญชีที่ถูกอายัด:*\n';frozen.forEach(a=>{msg+=`• ${a.name} (${a.bank||'?'}) ${a.brand?'| '+a.brand:''}\n`;});}
-  msg+=brandLines;
-  msg+=`\n━━━━━━━━━━━━━━\n🕐 ${ts()}`;
+
+  // Bank breakdown by shift
+  const bankShiftMap={};
+  accs.forEach(a=>{
+    const bank=a.bank||'ไม่ระบุ';
+    const shift=a.accShift||'ไม่ระบุกะ';
+    const key=bank+'|'+shift;
+    if(!bankShiftMap[key])bankShiftMap[key]={bank,shift,count:0};
+    bankShiftMap[key].count++;
+  });
+  // Sort: shift A first, then B, then others; within same shift sort by count desc
+  const shiftOrder={'A':0,'B':1,'ไม่ระบุกะ':2};
+  const bankLines=Object.values(bankShiftMap)
+    .sort((x,y)=>(shiftOrder[x.shift]??2)-(shiftOrder[y.shift]??2)||y.count-x.count)
+    .map(r=>{
+      const icon=r.shift==='A'?'🌅':r.shift==='B'?'🌙':'·';
+      return `  ${icon} ${r.bank} ${r.count} บัญชี (กะ${r.shift})`;
+    }).join('\n');
+
+  let msg=`📊 *${cfg.team}* | ${ts()}\n`;
+  msg+=`━━━━━━━━━━━━━━\n`;
+  msg+=`🏦 *${accs.length}* บัญชีทั้งหมด\n`;
+  msg+=`💰 *${fmt(totalBal)}* ยอดรวมคงเหลือ\n`;
+  msg+=`🔒 *${frozen.length}* บัญชีถูกอายัด\n`;
+  msg+=`💳 *${fmt(totalAtmLeft)}* / ${atmAccs.length} บัญชี วงเงินกด ATM\n`;
+  msg+=`📲 *${fmt(totalQrLeft)}* / ${qrAccs.length} บัญชี วงเงิน QR\n`;
+  msg+=`💸 *${fmt(totalSentCash)}* ยอดส่งกดรวม\n`;
+  msg+=`🌅 *${tgShiftA}* บัญชีกะ A  🌙 *${tgShiftB}* บัญชีกะ B\n`;
+  msg+=`━━━━━━━━━━━━━━\n`;
+  msg+=bankLines;
   await sendTG(groupId,msg);
 }
 

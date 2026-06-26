@@ -1282,12 +1282,13 @@ async function sendDashToGroup(groupId,note){
     brandLines+=`💳 ATM เหลือ: ${fmt(bAtm)}\n`;
     brandLines+=`📲 QR เหลือ: ${fmt(bQr)}\n`;
     brandLines+=`💸 ส่งกดแล้ว: ${fmt(bSent)}\n`;
-    // Individual accounts
+    // Individual accounts (bank + shift only, no name)
     arr.forEach(a=>{
       const cashL=Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0));
       const qrL=Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0));
-      const shiftTag=a.accShift?` [กะ${a.accShift}]`:'';
-      brandLines+=`  • ${a.name||'—'}${shiftTag} (${a.bank||'?'}) ${a.frozen?'🔒':''}\n    💰${fmt(a.balance)} | ATM ${fmt(cashL)} | QR ${fmt(qrL)}\n`;
+      const shiftTag=a.accShift?` กะ${a.accShift}`:'';
+      const frozenTag=a.frozen?' 🔒':'';
+      brandLines+=`  • ${a.bank||'?'}${shiftTag}${frozenTag} | 💰${fmt(a.balance)} | ATM ${fmt(cashL)} | QR ${fmt(qrL)}\n`;
     });
   });
 

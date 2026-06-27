@@ -257,6 +257,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="nav-item" onclick="goPage('dashboard')"><span class="nav-icon">📊</span>ภาพรวม</div>
     <div class="nav-item" onclick="goPage('accounts')"><span class="nav-icon">🏦</span>บัญชี</div>
     <div class="nav-item" onclick="goPage('history')"><span class="nav-icon">🕑</span>ประวัติ</div>
+    <div class="nav-item" onclick="goPage('daily')"><span class="nav-icon">📅</span>รายวัน</div>
     <div class="nav-item" onclick="goPage('settings')"><span class="nav-icon">⚙️</span>ตั้งค่า</div>
   </div>
 
@@ -312,7 +313,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         <label>ส่งเข้า Telegram กลุ่ม</label>
         <div id="s3am-tg-groups"><div style="font-size:12px;color:var(--muted)">ยังไม่มีกลุ่ม — ตั้งค่าในหน้า ⚙️</div></div>
       </div>
-      <button class="btn btn-cyan" id="s3am-btn" onclick="submit3amSummary()">📊 บันทึกสรุปยอดตี 3</button>
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <button class="btn btn-cyan" id="s3am-btn" onclick="submit3amSummary()" style="flex:2">📊 บันทึก + ส่ง Telegram</button>
+        <button class="btn btn-primary" onclick="send3amReportNow()" style="flex:1">📤 ส่งรายงานทันที</button>
+      </div>
+      <!-- Auto-send at 03:00 -->
+      <div style="background:rgba(34,211,238,.07);border:1px solid rgba(34,211,238,.2);border-radius:10px;padding:12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:8px;">⏰ ส่งอัตโนมัติตี 3 (03:00)</div>
+        <div id="s3am-auto-groups"><div style="font-size:12px;color:var(--muted)">กำลังโหลด...</div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.6;">ติ๊กกลุ่มที่ต้องการรับรายงานอัตโนมัติตี 3 ทุกวัน (รวมสรุปวงเงิน + ยอดตี 3)</div>
+      </div>
     </div>
 
   </div>
@@ -373,6 +383,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="filter-btn" onclick="filterHist('อื่นๆ',this)">📌 อื่นๆ</div>
     </div>
     <div id="hist-list"><div class="empty"><div class="empty-icon">📋</div>ยังไม่มีข้อมูล</div></div>
+  </div>
+
+  <!-- DAILY HISTORY -->
+  <div class="page" id="page-daily">
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.7;">ยอดวงเงินที่ใช้แต่ละวัน — ระบบจะ snapshot อัตโนมัติตอน 00:00 ของทุกวัน</div>
+    <div id="daily-hist-list"><div class="empty"><div class="empty-icon">📅</div>ยังไม่มีข้อมูลรายวัน</div></div>
   </div>
 
   <!-- SETTINGS -->
@@ -524,7 +540,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <script>
 let DB='', cfg=JSON.parse(localStorage.getItem('fw_cfg3')||'null');
 let local=JSON.parse(localStorage.getItem('fw_local3')||'{}');
-let accounts={}, updates={}, presence={};
+let accounts={}, updates={}, presence={}, dailySnapshots={};
 let unsubFns=[], schTimers=[], histFilter='all', selType='', selShift='';
 let dirtyEdits=new Set();
 
@@ -584,18 +600,19 @@ function launchApp(){
   if(!local.shift) local.shift='เช้า';
   // Init 3AM fields with defaults if not set
   if(!local.summary3amFields) local.summary3amFields=[...DEFAULT_3AM_FIELDS];
+  if(!local.auto3amGroups) local.auto3amGroups=[];
   document.getElementById('user-chip').textContent=local.myname||'—';
   document.getElementById('s-myname').value=local.myname||'';
   document.getElementById('s-token').value=local.token||'';
   document.getElementById('s-db-url').textContent=DB;
   updateShiftDisplay();
   renderTGGroups(); renderSchedules(); renderFreezeAlertGroups(); renderBrandSettings();
-  render3amFields(); render3amFieldSettings();
+  render3amFields(); render3amFieldSettings(); render3amAutoGroups();
   startListeners(); startClock(); startSchChecker();
   setPresence(true);
   window.addEventListener('beforeunload',()=>setPresence(false));
   const lastP=local.lastPage||'update';
-  const validPages=['update','dashboard','accounts','history','settings'];
+  const validPages=['update','dashboard','accounts','history','daily','settings'];
   if(validPages.includes(lastP)) goPage(lastP);
 }
 
@@ -711,7 +728,7 @@ async function submit3amSummary(){
     const el=document.getElementById('s3am-f-'+f.id);
     if(el)el.value='';
   });
-  btn.disabled=false; btn.textContent='📊 บันทึกสรุปยอดตี 3';
+  btn.disabled=false; btn.textContent='📊 บันทึก + ส่ง Telegram';
   showToast('✅ บันทึกสรุปยอดตี 3 แล้ว','ok');
 }
 
@@ -887,11 +904,16 @@ function startListeners(){
     else if(d){Object.keys(d).forEach(k=>{if(d[k]===null)delete presence[k]; else presence[k]=d[k];});}
     renderOnline();
   }));
+  unsubFns.push(fbListen('dailySnapshots',(d,evType)=>{
+    if(evType==='put'){dailySnapshots=d||{};}
+    else if(d){Object.keys(d).forEach(k=>{if(d[k]===null)delete dailySnapshots[k]; else dailySnapshots[k]=d[k];});}
+    renderDailyHistory();
+  }));
 }
 
 function renderAllSafe(){
   renderDashboard(); renderAccFullSafe(); renderHistory(); populateSels();
-  renderUpdateTGGroups(); renderDashTGGroups(); render3amTGGroups();
+  renderUpdateTGGroups(); renderDashTGGroups(); render3amTGGroups(); render3amAutoGroups();
 }
 
 async function setPresence(on){
@@ -906,18 +928,244 @@ function startClock(){
     document.getElementById('clock').textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',hour12:false});
   },1000);
 }
+
+let _lastMidnightDate='', _last3amDate='';
+
 function startSchChecker(){
-  const t=setInterval(()=>{
-    if(!local.schedules||!local.schedules.length)return;
+  const t=setInterval(async()=>{
     const now=new Date();
     const hhmm=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-    if(now.getSeconds()<12){
+    const dateKey=now.toISOString().slice(0,10); // YYYY-MM-DD
+    const sec=now.getSeconds();
+    if(sec>12)return; // only fire in first 12 seconds of the minute
+
+    // ── Standard scheduled sends (user-defined times) ──
+    if(local.schedules&&local.schedules.length){
       local.schedules.forEach(s=>{
         if(s.time===hhmm) sendDashToGroup(s.groupId,'⏰ ส่งอัตโนมัติ '+s.time+' น.');
       });
     }
+
+    // ── Midnight 00:00 — snapshot usage then reset ──
+    if(hhmm==='00:00'&&_lastMidnightDate!==dateKey){
+      _lastMidnightDate=dateKey;
+      await midnightReset(dateKey);
+    }
+
+    // ── 03:00 auto-send 3AM report if enabled ──
+    if(hhmm==='03:00'&&_last3amDate!==dateKey){
+      _last3amDate=dateKey;
+      if(local.auto3amGroups&&local.auto3amGroups.length&&local.token){
+        const msg=build3amAutoMsg();
+        for(const gid of local.auto3amGroups) await sendTG(gid,msg);
+      }
+    }
   },10000);
   schTimers.push(t);
+}
+
+// Snapshot today's usage → dailySnapshots/{yesterday} then reset usedCash/usedScan to 0
+async function midnightReset(todayKey){
+  const accs=Object.values(accounts);
+  if(!accs.length)return;
+  // The snapshot belongs to yesterday (the day that just ended)
+  const yesterday=new Date(); yesterday.setDate(yesterday.getDate()-1);
+  const snapKey=yesterday.toISOString().slice(0,10);
+  const snapLabel=yesterday.toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'2-digit'});
+
+  // Build per-brand summary for snapshot
+  const brandMap={};
+  accs.forEach(a=>{
+    const brand=(a.brand||'ไม่ระบุแบรนด์').trim();
+    if(!brandMap[brand])brandMap[brand]={sentCash:0,sentScan:0,count:0,frozenCount:0};
+    brandMap[brand].sentCash+=Number(a.usedCash)||0;
+    brandMap[brand].sentScan+=Number(a.usedScan)||0;
+    if(a.frozen)brandMap[brand].frozenCount++;
+    brandMap[brand].count++;
+  });
+
+  const snapshot={
+    date:snapKey,dateLabel:snapLabel,
+    totalSentCash:accs.reduce((s,a)=>s+(Number(a.usedCash)||0),0),
+    totalSentScan:accs.reduce((s,a)=>s+(Number(a.usedScan)||0),0),
+    brands:brandMap,
+    accounts:accs.map(a=>({id:a.id,name:a.name,brand:a.brand||'',bank:a.bank||'',usedCash:Number(a.usedCash)||0,usedScan:Number(a.usedScan)||0,limitCash:Number(a.limitCash)||0,limitScan:Number(a.limitScan)||0})),
+    createdAt:Date.now()
+  };
+
+  // Save snapshot (don't overwrite if exists already)
+  const existing=await fetch(fbUrl('dailySnapshots/'+snapKey)).then(r=>r.json()).catch(()=>null);
+  if(!existing) await fbSet('dailySnapshots/'+snapKey,snapshot);
+
+  // Reset usedCash + usedScan for all accounts
+  for(const a of accs){
+    if((Number(a.usedCash)||0)>0) await fbSet('accounts/'+a.id+'/usedCash',0);
+    if((Number(a.usedScan)||0)>0) await fbSet('accounts/'+a.id+'/usedScan',0);
+  }
+  console.log('[SANJIDATA] Midnight reset done for',snapKey);
+}
+
+// Build auto 3AM report from latest 3AM summary in DB
+function build3amAutoMsg(){
+  const fields=local.summary3amFields||DEFAULT_3AM_FIELDS;
+  const latest=Object.values(updates)
+    .filter(u=>u.type==='สรุปยอดตี3')
+    .sort((a,b)=>b.createdAt-a.createdAt)[0];
+  const accs=Object.values(accounts);
+  const totalSentCash=accs.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
+  const totalSentScan=accs.reduce((s,a)=>s+(Number(a.usedScan)||0),0);
+  const frozen=accs.filter(a=>a.frozen);
+  const brandMap={};
+  accs.forEach(a=>{
+    const brand=(a.brand||'ไม่ระบุแบรนด์').trim();
+    if(!brandMap[brand])brandMap[brand]={totalLeft:0,frozenCount:0,count:0};
+    brandMap[brand].totalLeft+=Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0));
+    brandMap[brand].totalLeft+=Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0));
+    if(a.frozen)brandMap[brand].frozenCount++;
+    brandMap[brand].count++;
+  });
+
+  let msg=`🌙 *รายงานอัตโนมัติตี 3 — ${cfg.team}*\n`;
+  msg+=`📅 ${ts()}\n`;
+  msg+=`━━━━━━━━━━━━━━\n`;
+  // Brand credit summary
+  msg+=`*วงเงินรวมเหลือ รายแบรนด์*\n`;
+  Object.entries(brandMap).forEach(([brand,d])=>{
+    const lockStr=d.frozenCount?` 🔒 ${d.frozenCount}`:'';
+    msg+=`▪️ *${brand}* (${d.count} บัญชี${lockStr}): *${fmt(d.totalLeft)}*\n`;
+  });
+  msg+=`━━━━━━━━━━━━━━\n`;
+  msg+=`🔒 อายัด: *${frozen.length}* บัญชี\n`;
+  msg+=`💸 ส่งกดรวม: *${fmt(totalSentCash)}*\n`;
+  msg+=`📤 โอนออกรวม: *${fmt(totalSentScan)}*\n`;
+  // Append 3AM custom summary if exists
+  if(latest&&latest.summary3am){
+    msg+=`━━━━━━━━━━━━━━\n`;
+    msg+=`*สรุปยอดตี 3*\n`;
+    fields.forEach(f=>{
+      const d=latest.summary3am[f.id];
+      if(!d)return;
+      const val=f.type==='number'?fmt(d.value):d.value;
+      if(val&&val!=='฿0') msg+=`📌 *${f.label}:* ${val}\n`;
+    });
+    msg+=`👤 โดย: ${latest.reporter||'—'}\n`;
+  }
+  return msg;
+}
+
+  return msg;
+}
+
+// Send 3AM report to selected groups immediately
+async function send3amReportNow(){
+  if(!local.token)return showToast('ตั้งค่า Bot Token ก่อน','err');
+  const gids=(local.auto3amGroups&&local.auto3amGroups.length)
+    ?local.auto3amGroups
+    :(local.tgGroups||[]).map(g=>g.id);
+  if(!gids.length)return showToast('ยังไม่มีกลุ่ม Telegram','err');
+  const msg=build3amAutoMsg();
+  for(const gid of gids) await sendTG(gid,msg);
+  showToast('✅ ส่งรายงานตี 3 แล้ว','ok');
+}
+
+// Render auto-3AM group checkboxes in the 3AM card
+function render3amAutoGroups(){
+  const el=document.getElementById('s3am-auto-groups');
+  if(!el)return;
+  if(!local.tgGroups||!local.tgGroups.length){
+    el.innerHTML='<div style="font-size:12px;color:var(--muted)">ยังไม่มีกลุ่ม — ตั้งค่าในหน้า ⚙️</div>';return;
+  }
+  if(!local.auto3amGroups)local.auto3amGroups=[];
+  el.innerHTML=local.tgGroups.map(g=>`
+    <div class="tg-group-check">
+      <input type="checkbox" id="a3am-${g.id}" value="${g.id}" ${local.auto3amGroups.includes(g.id)?'checked':''} onchange="toggleAuto3amGroup('${g.id}',this.checked)">
+      <label for="a3am-${g.id}" style="font-size:13px;cursor:pointer">${g.name}</label>
+    </div>`).join('');
+}
+
+function toggleAuto3amGroup(id,checked){
+  if(!local.auto3amGroups)local.auto3amGroups=[];
+  if(checked){if(!local.auto3amGroups.includes(id))local.auto3amGroups.push(id);}
+  else{local.auto3amGroups=local.auto3amGroups.filter(x=>x!==id);}
+  saveLocal();
+}
+
+// ── DAILY HISTORY ──
+function renderDailyHistory(){
+  const el=document.getElementById('daily-hist-list');
+  if(!el)return;
+  const days=Object.values(dailySnapshots).sort((a,b)=>b.createdAt-a.createdAt);
+  if(!days.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📅</div>ยังไม่มีข้อมูลรายวัน<div style="font-size:12px;margin-top:8px;color:var(--muted)">ระบบจะบันทึกอัตโนมัติตอน 00:00 ของทุกวัน</div></div>';
+    return;
+  }
+  el.innerHTML=days.map(day=>{
+    const brands=day.brands||{};
+    const brandLines=Object.entries(brands).map(([brand,d])=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--bd);">
+        <span style="font-size:12px;font-weight:600;">🏷 ${brand} <span style="color:var(--muted);font-weight:400;">(${d.count})</span></span>
+        <span style="font-family:var(--mono);font-size:12px;">💸 ${fmt(d.sentCash)}&nbsp;&nbsp;📤 ${fmt(d.sentScan)}</span>
+      </div>`).join('');
+    const accsUsed=(day.accounts||[]).filter(a=>a.usedCash>0||a.usedScan>0);
+    const accLines=accsUsed.map(a=>`
+      <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(37,45,69,.5);">
+        <span style="font-size:11px;color:var(--text);">${a.name||'—'} <span style="color:var(--muted)">${a.bank||''}${a.brand?' · '+a.brand:''}</span></span>
+        <span style="font-family:var(--mono);font-size:11px;">💳 ${fmt(a.usedCash)} / 📤 ${fmt(a.usedScan)}</span>
+      </div>`).join('');
+    const safeDate=(day.date||'').replace(/-/g,'_');
+    return `<div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-weight:700;font-size:15px;color:var(--cyan);">📅 ${day.dateLabel||day.date}</div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-sm" onclick="toggleDayDetail('${safeDate}')">🔍 รายบัญชี</button>
+          <button class="btn-sm success" onclick="sendDaySnapshot('${day.date}')">📤 TG</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+        <div style="background:var(--s2);border-radius:8px;padding:9px 11px;">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px;">💸 ส่งกดรวม</div>
+          <div style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--yellow);">${fmt(day.totalSentCash)}</div>
+        </div>
+        <div style="background:var(--s2);border-radius:8px;padding:9px 11px;">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px;">📤 โอนออกรวม</div>
+          <div style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--purple);">${fmt(day.totalSentScan)}</div>
+        </div>
+      </div>
+      <div style="margin-bottom:6px;">${brandLines}</div>
+      <div id="day-detail-${safeDate}" style="display:none;margin-top:8px;background:var(--s2);border-radius:8px;padding:10px;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;">รายบัญชีที่มีการใช้วงเงิน</div>
+        ${accsUsed.length?accLines:'<div style="font-size:12px;color:var(--muted);">ไม่มีการใช้วงเงิน</div>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDayDetail(safeDate){
+  const el=document.getElementById('day-detail-'+safeDate);
+  if(!el)return;
+  el.style.display=el.style.display==='none'?'block':'none';
+}
+
+async function sendDaySnapshot(dateKey){
+  if(!local.token)return showToast('ตั้งค่า Bot Token ก่อน','err');
+  const day=dailySnapshots[dateKey];
+  if(!day)return showToast('ไม่พบข้อมูลวันนี้','err');
+  const gids=(local.auto3amGroups&&local.auto3amGroups.length)
+    ?local.auto3amGroups
+    :(local.tgGroups||[]).map(g=>g.id);
+  if(!gids.length)return showToast('ยังไม่มีกลุ่ม Telegram','err');
+  const brands=day.brands||{};
+  let msg=`📅 *สรุปยอดวัน ${day.dateLabel||day.date} — ${cfg.team}*\n`;
+  msg+=`━━━━━━━━━━━━━━\n`;
+  Object.entries(brands).forEach(([brand,d])=>{
+    msg+=`▪️ *${brand}* (${d.count} บัญชี)\n`;
+    msg+=`  💸 ส่งกด: ${fmt(d.sentCash)}  📤 โอนออก: ${fmt(d.sentScan)}\n`;
+  });
+  msg+=`━━━━━━━━━━━━━━\n`;
+  msg+=`💸 รวมส่งกด: *${fmt(day.totalSentCash)}*\n`;
+  msg+=`📤 รวมโอนออก: *${fmt(day.totalSentScan)}*\n`;
+  for(const gid of gids) await sendTG(gid,msg);
+  showToast('✅ ส่งสรุปรายวันแล้ว','ok');
 }
 
 // ── FORMAT ──
@@ -1294,10 +1542,10 @@ function addTGGroup(){
   local.tgGroups.push({name,id}); saveLocal();
   document.getElementById('tg-gname').value='';
   document.getElementById('tg-gid').value='';
-  renderTGGroups(); renderUpdateTGGroups(); renderDashTGGroups(); render3amTGGroups();
+  renderTGGroups(); renderUpdateTGGroups(); renderDashTGGroups(); render3amTGGroups(); render3amAutoGroups();
   showToast('✅ เพิ่มกลุ่มแล้ว','ok');
 }
-function removeTGGroup(i){local.tgGroups.splice(i,1);saveLocal();renderTGGroups();renderUpdateTGGroups();renderDashTGGroups();render3amTGGroups();}
+function removeTGGroup(i){local.tgGroups.splice(i,1);saveLocal();renderTGGroups();renderUpdateTGGroups();renderDashTGGroups();render3amTGGroups();render3amAutoGroups();}
 function addSchedule(){
   const time=document.getElementById('sch-time').value;
   const groupId=document.getElementById('sch-group').value;
@@ -1441,15 +1689,13 @@ async function sendDashToGroup(groupId,note){
   const totalSentCash=accs.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
   const totalSentScan=accs.reduce((s,a)=>s+(Number(a.usedScan)||0),0);
 
-  // Per-brand: total credit left (ATM + โอนออก combined), frozen count
+  // Per-brand: total credit left (ATM + โอนออก combined only), frozen count
   const brandMap={};
   accs.forEach(a=>{
     const brand=(a.brand||'ไม่ระบุแบรนด์').trim();
-    if(!brandMap[brand])brandMap[brand]={atmLeft:0,scanLeft:0,frozenCount:0,count:0,sentCash:0,sentScan:0};
-    brandMap[brand].atmLeft+=Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0));
-    brandMap[brand].scanLeft+=Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0));
-    brandMap[brand].sentCash+=Number(a.usedCash)||0;
-    brandMap[brand].sentScan+=Number(a.usedScan)||0;
+    if(!brandMap[brand])brandMap[brand]={totalLeft:0,frozenCount:0,count:0};
+    brandMap[brand].totalLeft+=Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0));
+    brandMap[brand].totalLeft+=Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0));
     if(a.frozen)brandMap[brand].frozenCount++;
     brandMap[brand].count++;
   });
@@ -1461,10 +1707,9 @@ async function sendDashToGroup(groupId,note){
   msg+=`━━━━━━━━━━━━━━\n`;
   msg+=`*วงเงินรวมเหลือ รายแบรนด์*\n`;
   Object.entries(brandMap).forEach(([brand,d])=>{
-    const total=d.atmLeft+d.scanLeft;
-    msg+=`🏷 *${brand}* (${d.count} บัญชี${d.frozenCount?` · 🔒${d.frozenCount}`:''})\n`;
-    msg+=`  📊 วงเงินรวมเหลือ: *${fmt(total)}*\n`;
-    msg+=`  💳 ATM เหลือ: ${fmt(d.atmLeft)}  📲 โอนออก เหลือ: ${fmt(d.scanLeft)}\n`;
+    const lockStr=d.frozenCount?` 🔒 ${d.frozenCount}`:'';
+    msg+=`▪️ *${brand}* (${d.count} บัญชี${lockStr})\n`;
+    msg+=`  📊 วงเงินรวมเหลือ: *${fmt(d.totalLeft)}*\n`;
   });
   msg+=`━━━━━━━━━━━━━━\n`;
   msg+=`💸 *ยอดส่งกดรวม: ${fmt(totalSentCash)}*\n`;
@@ -1628,11 +1873,13 @@ function goPage(p){
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
-  const pages=['update','dashboard','accounts','history','settings'];
-  document.querySelectorAll('.nav-item')[pages.indexOf(p)].classList.add('active');
+  const pages=['update','dashboard','accounts','history','daily','settings'];
+  const idx=pages.indexOf(p);
+  if(idx>=0) document.querySelectorAll('.nav-item')[idx].classList.add('active');
   local.lastPage=p; saveLocal();
   if(p==='dashboard'){renderDashboard();renderOnline();renderDashTGGroups();}
-  if(p==='update'){render3amFields();render3amTGGroups();}
+  if(p==='update'){render3amFields();render3amTGGroups();render3amAutoGroups();}
+  if(p==='daily'){renderDailyHistory();}
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 

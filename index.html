@@ -8,7 +8,7 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 :root{
   --bg:#080b12;--s1:#0f1420;--s2:#161c2e;--s3:#1e2540;--bd:#252d45;--bd2:#2e3a5a;
-  --blue:#4a8fff;--green:#2dd67b;--yellow:#f5b731;--red:#f04f4f;--purple:#9b6cff;
+  --blue:#4a8fff;--green:#2dd67b;--yellow:#f5b731;--red:#f04f4f;--purple:#9b6cff;--cyan:#22d3ee;
   --text:#dce4f5;--muted:#6b7799;--font:'IBM Plex Sans Thai',sans-serif;--mono:'IBM Plex Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -67,6 +67,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px;}
 .card-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;}
 
+/* 3AM Summary Card special styling */
+.card-3am{background:var(--s1);border:1px solid rgba(34,211,238,.35);border-radius:12px;padding:14px;margin-bottom:12px;position:relative;overflow:hidden;}
+.card-3am::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--purple));}
+.card-3am-title{font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+
 .field{margin-bottom:12px;}
 .field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;}
 .field input,.field select,.field textarea{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:14px;padding:10px 12px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
@@ -86,6 +91,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .chip.sel-yellow{background:rgba(245,183,49,.12);color:var(--yellow);border-color:rgba(245,183,49,.4);}
 .chip.sel-blue{background:rgba(74,143,255,.12);color:var(--blue);border-color:rgba(74,143,255,.4);}
 .chip.sel-purple{background:rgba(155,108,255,.12);color:var(--purple);border-color:rgba(155,108,255,.4);}
+.chip.sel-cyan{background:rgba(34,211,238,.12);color:var(--cyan);border-color:rgba(34,211,238,.4);}
 
 .btn{width:100%;border:none;border-radius:9px;padding:13px;font-size:14px;font-weight:700;font-family:var(--font);cursor:pointer;transition:opacity .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:0;}
 .btn:active{transform:scale(.97);}
@@ -93,6 +99,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .btn-primary{background:var(--blue);color:#fff;}
 .btn-danger{background:rgba(240,79,79,.12);color:var(--red);border:1px solid rgba(240,79,79,.4);}
 .btn-green{background:rgba(45,214,123,.1);color:var(--green);border:1px solid rgba(45,214,123,.3);}
+.btn-cyan{background:rgba(34,211,238,.1);color:var(--cyan);border:1px solid rgba(34,211,238,.3);}
 
 .btn-sm{padding:7px 10px;font-size:11px;font-weight:600;font-family:var(--font);border-radius:6px;cursor:pointer;background:var(--s3);color:var(--muted);border:1px solid var(--bd2);display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
 .btn-sm.danger{color:var(--red);border-color:rgba(240,79,79,.3);}
@@ -110,6 +117,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .hist-time{font-family:var(--mono);font-size:10px;color:var(--muted);flex-shrink:0;}
 .hist-detail{font-size:12px;color:var(--muted);line-height:1.5;}
 .hist-amount{font-family:var(--mono);font-weight:600;font-size:14px;margin-top:3px;}
+
+/* 3AM summary history item */
+.hist-3am{background:var(--s2);border:1px solid rgba(34,211,238,.3);border-radius:10px;padding:11px 13px;margin-bottom:8px;}
 
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;align-items:flex-end;justify-content:center;}
 .modal-bg.open{display:flex;}
@@ -149,6 +159,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .hint{font-size:11px;color:var(--muted);line-height:1.6;margin-top:5px;}
 .hint a{color:var(--blue);text-decoration:none;}
 
+/* 3AM Dashboard Summary */
+.summary-3am-card{background:var(--s1);border:1px solid rgba(34,211,238,.3);border-radius:12px;padding:14px;margin-bottom:12px;position:relative;overflow:hidden;}
+.summary-3am-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--purple));}
+.summary-3am-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.summary-3am-title{font-size:13px;font-weight:700;color:var(--cyan);display:flex;align-items:center;gap:7px;}
+.summary-3am-time{font-family:var(--mono);font-size:10px;color:var(--muted);}
+.summary-3am-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.s3am-box{background:var(--s2);border-radius:8px;padding:10px 12px;}
+.s3am-lbl{font-size:10px;color:var(--muted);margin-bottom:3px;}
+.s3am-val{font-family:var(--mono);font-size:15px;font-weight:600;}
+.s3am-reporter{font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--bd);}
+
 /* Brand group card in dashboard */
 .brand-group-card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px;}
 .brand-group-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;cursor:pointer;}
@@ -166,6 +188,25 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .toast.ok{border-color:rgba(45,214,123,.4);color:var(--green);}
 .toast.err{border-color:rgba(240,79,79,.4);color:var(--red);}
 .toast.warn{border-color:rgba(245,183,49,.4);color:var(--yellow);}
+
+/* inline edit */
+.acc-card{background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:13px;margin-bottom:10px;width:100%;min-width:0;box-sizing:border-box;}
+.acc-card.frozen{border-color:rgba(240,79,79,.5);background:rgba(240,79,79,.04);}
+.acc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:6px;width:100%;min-width:0;}
+.acc-name{font-weight:700;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.acc-brand{font-size:11px;color:var(--purple);font-weight:600;margin-top:1px;}
+.acc-num{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:1px;}
+.badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.bg-green{background:rgba(45,214,123,.15);color:var(--green);}
+.bg-red{background:rgba(240,79,79,.2);color:var(--red);}
+.bg-yellow{background:rgba(245,183,49,.15);color:var(--yellow);}
+.bg-blue{background:rgba(74,143,255,.15);color:var(--blue);}
+.bg-purple{background:rgba(155,108,255,.15);color:var(--purple);}
+.bg-cyan{background:rgba(34,211,238,.15);color:var(--cyan);}
+.bal-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;width:100%;min-width:0;}
+.bal-box{background:var(--s3);border-radius:8px;padding:9px 10px;min-width:0;overflow:hidden;}
+.bal-label{font-size:10px;color:var(--muted);margin-bottom:3px;}
+.bal-val{font-family:var(--mono);font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -219,8 +260,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="nav-item" onclick="goPage('settings')"><span class="nav-icon">⚙️</span>ตั้งค่า</div>
   </div>
 
-  <!-- UPDATE -->
+  <!-- UPDATE PAGE -->
   <div class="page active" id="page-update">
+
+    <!-- แจ้งอัปเดตทั่วไป -->
     <div class="card">
       <div class="card-title">แจ้งอัปเดต / แจ้งปัญหา</div>
       <div class="field">
@@ -236,7 +279,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
           <div class="chip" onclick="pickType('บัญชีถูกอายัด',this,'sel-red')">🔒 อายัด</div>
           <div class="chip" onclick="pickType('ยอดเงิน',this,'sel-blue')">💰 ยอดเงิน</div>
           <div class="chip" onclick="pickType('ส่งกดเงิน',this,'sel-green')">💳 ส่งกดเงิน</div>
-          <div class="chip" onclick="pickType('โอนออก QR',this,'sel-yellow')">📲 โอนออก QR</div>
+          <div class="chip" onclick="pickType('โอนออก',this,'sel-yellow')">📲 โอนออก</div>
           <div class="chip" onclick="pickType('อื่นๆ',this,'sel-yellow')">📌 อื่นๆ</div>
         </div>
       </div>
@@ -258,6 +301,20 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       </div>
       <button class="btn btn-primary" id="ut-btn" onclick="submitUpdate()">📤 ส่งอัปเดต</button>
     </div>
+
+    <!-- สรุปยอดตี3 -->
+    <div class="card-3am">
+      <div class="card-3am-title">🌙 สรุปยอดตี 3</div>
+      <div id="fields-3am-container">
+        <!-- Rendered dynamically from local.summary3amFields -->
+      </div>
+      <div class="field">
+        <label>ส่งเข้า Telegram กลุ่ม</label>
+        <div id="s3am-tg-groups"><div style="font-size:12px;color:var(--muted)">ยังไม่มีกลุ่ม — ตั้งค่าในหน้า ⚙️</div></div>
+      </div>
+      <button class="btn btn-cyan" id="s3am-btn" onclick="submit3amSummary()">📊 บันทึกสรุปยอดตี 3</button>
+    </div>
+
   </div>
 
   <!-- DASHBOARD -->
@@ -268,13 +325,17 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="stat"><div class="stat-val" id="d-frozen-count" style="color:var(--red)">—</div><div class="stat-lbl">บัญชีถูกอายัด</div></div>
       <div class="stat"><div class="stat-val" id="d-updates" style="color:var(--yellow)">—</div><div class="stat-lbl">อัปเดตวันนี้</div></div>
       <div class="stat"><div class="stat-val" id="d-atm-left" style="color:var(--blue)">—</div><div class="stat-lbl">💳 วงเงินกด ATM รวม</div></div>
-      <div class="stat"><div class="stat-val" id="d-qr-left" style="color:var(--purple)">—</div><div class="stat-lbl">📲 วงเงิน QR รวม</div></div>
+      <div class="stat"><div class="stat-val" id="d-qr-left" style="color:var(--purple)">—</div><div class="stat-lbl">📲 วงเงินโอนออก รวม</div></div>
       <div class="stat" style="grid-column:span 2"><div class="stat-val" id="d-sent-cash" style="color:var(--yellow);font-size:16px">—</div><div class="stat-lbl">💸 ยอดเงินส่งกดรวมทุกบัญชี</div></div>
     </div>
     <div class="stat-grid" style="margin-top:-4px;margin-bottom:12px;">
       <div class="stat"><div class="stat-val" id="d-shift-a" style="color:var(--yellow)">—</div><div class="stat-lbl">🌅 บัญชีกะ A</div></div>
       <div class="stat"><div class="stat-val" id="d-shift-b" style="color:var(--purple)">—</div><div class="stat-lbl">🌙 บัญชีกะ B</div></div>
     </div>
+
+    <!-- 3AM Summary on dashboard -->
+    <div id="d-3am-summary"></div>
+
     <div id="d-freeze-alerts"></div>
     <div class="tg-send-box">
       <div class="tg-send-title">📨 ส่งสรุปเข้า Telegram</div>
@@ -305,9 +366,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="filter-btn" onclick="filterHist('บัญชีถูกอายัด',this)">🔒 อายัด</div>
       <div class="filter-btn" onclick="filterHist('ยอดเงิน',this)">💰 ยอดเงิน</div>
       <div class="filter-btn" onclick="filterHist('ส่งกดเงิน',this)">💳 กดเงิน</div>
-      <div class="filter-btn" onclick="filterHist('โอนออก QR',this)">📲 โอน QR</div>
+      <div class="filter-btn" onclick="filterHist('โอนออก',this)">📲 โอนออก</div>
       <div class="filter-btn" onclick="filterHist('เพิ่มบัญชี',this)">🏦 เพิ่มบัญชี</div>
       <div class="filter-btn" onclick="filterHist('แก้ไขยอด',this)">✏️ แก้ยอด</div>
+      <div class="filter-btn" onclick="filterHist('สรุปยอดตี3',this)">🌙 ตี 3</div>
       <div class="filter-btn" onclick="filterHist('อื่นๆ',this)">📌 อื่นๆ</div>
     </div>
     <div id="hist-list"><div class="empty"><div class="empty-icon">📋</div>ยังไม่มีข้อมูล</div></div>
@@ -327,6 +389,25 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       </div>
       <button class="btn btn-primary" onclick="saveUserSettings()">💾 บันทึก</button>
     </div>
+
+    <!-- 3AM Summary Fields Settings -->
+    <div class="card" style="border-color:rgba(34,211,238,.3);">
+      <div class="s-sec" style="color:var(--cyan)">🌙 ตั้งค่าหัวข้อสรุปยอดตี 3</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.7">กำหนดหัวข้อและชนิดข้อมูลที่ต้องการบันทึกในช่วงสรุปยอดตี 3 ลาก-วาง หรือใช้ปุ่มเรียงลำดับ</div>
+      <div id="s3am-field-list"></div>
+      <div class="divider"></div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:8px;">
+        <div class="field" style="margin-bottom:0"><label>ชื่อหัวข้อ</label><input id="s3am-new-label" placeholder="เช่น กำไร, หักข้อผิดพลาด"></div>
+        <div class="field" style="margin-bottom:0"><label>ชนิด</label>
+          <select id="s3am-new-type" style="background:var(--bg);border:1px solid var(--bd2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:14px;padding:10px 12px;outline:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'6\'%3E%3Cpath d=\'M0 0l5 6 5-6z\' fill=\'%236b7799\'/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;width:100%;">
+            <option value="number">ตัวเลข (฿)</option>
+            <option value="text">ข้อความ</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-cyan" onclick="add3amField()" style="margin-top:4px">➕ เพิ่มหัวข้อ</button>
+    </div>
+
     <div class="card">
       <div class="s-sec">จัดการแบรนด์</div>
       <div id="brand-list-settings"><div style="font-size:12px;color:var(--muted)">ยังไม่มีแบรนด์</div></div>
@@ -419,7 +500,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="field"><label>ยอดคงเหลือปัจจุบัน (฿)</label><div class="pfx"><span>฿</span><input type="number" class="mono" id="m-balance" placeholder="0"></div></div>
     <div class="field-row">
       <div class="field"><label>วงเงินกด/ATM (฿)</label><div class="pfx"><span>฿</span><input type="number" class="mono" id="m-lcash" placeholder="0"></div></div>
-      <div class="field"><label>วงเงินสแกน/QR (฿)</label><div class="pfx"><span>฿</span><input type="number" class="mono" id="m-lscan" placeholder="0"></div></div>
+      <div class="field"><label>วงเงินโอนออก (฿)</label><div class="pfx"><span>฿</span><input type="number" class="mono" id="m-lscan" placeholder="0"></div></div>
     </div>
     <input type="hidden" id="m-edit-id">
     <button class="btn btn-primary" id="m-save-btn" onclick="saveAccount()">💾 บันทึก</button>
@@ -445,8 +526,16 @@ let DB='', cfg=JSON.parse(localStorage.getItem('fw_cfg3')||'null');
 let local=JSON.parse(localStorage.getItem('fw_local3')||'{}');
 let accounts={}, updates={}, presence={};
 let unsubFns=[], schTimers=[], histFilter='all', selType='', selShift='';
-// Dirty-flag: suppress re-render while user has unsaved inline edits
 let dirtyEdits=new Set();
+
+// Default 3AM summary fields
+const DEFAULT_3AM_FIELDS=[
+  {id:'f1',label:'กำไร',type:'number'},
+  {id:'f2',label:'หักข้อผิดพลาด',type:'number'},
+  {id:'f3',label:'ขาดเท่าไหร่',type:'number'},
+  {id:'f4',label:'เงินเหลือ',type:'number'},
+  {id:'f5',label:'อื่นๆ',type:'text'},
+];
 
 // ── LOGIN ──
 async function doLogin(){
@@ -493,16 +582,18 @@ function launchApp(){
   if(!local.tgGroups) local.tgGroups=[];
   if(!local.schedules) local.schedules=[];
   if(!local.shift) local.shift='เช้า';
+  // Init 3AM fields with defaults if not set
+  if(!local.summary3amFields) local.summary3amFields=[...DEFAULT_3AM_FIELDS];
   document.getElementById('user-chip').textContent=local.myname||'—';
   document.getElementById('s-myname').value=local.myname||'';
   document.getElementById('s-token').value=local.token||'';
   document.getElementById('s-db-url').textContent=DB;
   updateShiftDisplay();
   renderTGGroups(); renderSchedules(); renderFreezeAlertGroups(); renderBrandSettings();
+  render3amFields(); render3amFieldSettings();
   startListeners(); startClock(); startSchChecker();
   setPresence(true);
   window.addEventListener('beforeunload',()=>setPresence(false));
-  // Restore last visited page
   const lastP=local.lastPage||'update';
   const validPages=['update','dashboard','accounts','history','settings'];
   if(validPages.includes(lastP)) goPage(lastP);
@@ -519,6 +610,155 @@ function saveName(){
 
 function saveLocal(){localStorage.setItem('fw_local3',JSON.stringify(local));}
 
+// ── 3AM SUMMARY FIELD MANAGEMENT ──
+function render3amFieldSettings(){
+  const el=document.getElementById('s3am-field-list');
+  if(!el)return;
+  const fields=local.summary3amFields||[];
+  if(!fields.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">ยังไม่มีหัวข้อ — เพิ่มด้านล่าง</div>';return;}
+  el.innerHTML=fields.map((f,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;margin-bottom:7px;">
+      <span style="font-size:13px;flex:1;font-weight:600;">${f.label} <span style="font-size:10px;color:var(--muted);font-weight:400;margin-left:4px;">${f.type==='number'?'ตัวเลข':'ข้อความ'}</span></span>
+      <div style="display:flex;gap:4px;">
+        ${i>0?`<button class="btn-sm" onclick="move3amField(${i},-1)" style="padding:5px 8px;">↑</button>`:''}
+        ${i<fields.length-1?`<button class="btn-sm" onclick="move3amField(${i},1)" style="padding:5px 8px;">↓</button>`:''}
+        <button class="btn-sm danger" onclick="remove3amField(${i})">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+function render3amFields(){
+  const el=document.getElementById('fields-3am-container');
+  if(!el)return;
+  const fields=local.summary3amFields||[];
+  if(!fields.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);margin-bottom:12px;">ยังไม่มีหัวข้อ — ตั้งค่าในหน้า ⚙️</div>';return;}
+  el.innerHTML=fields.map(f=>{
+    if(f.type==='number'){
+      return `<div class="field"><label>${f.label}</label><div class="pfx"><span>฿</span><input type="number" class="mono" id="s3am-f-${f.id}" placeholder="0"></div></div>`;
+    } else {
+      return `<div class="field"><label>${f.label}</label><textarea id="s3am-f-${f.id}" placeholder="กรอกข้อมูล..." style="min-height:52px;resize:vertical;width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:14px;padding:10px 12px;outline:none;"></textarea></div>`;
+    }
+  }).join('');
+}
+
+function add3amField(){
+  const label=document.getElementById('s3am-new-label').value.trim();
+  const type=document.getElementById('s3am-new-type').value;
+  if(!label)return showToast('กรอกชื่อหัวข้อด้วย','err');
+  if(!local.summary3amFields)local.summary3amFields=[];
+  const id='f'+Date.now();
+  local.summary3amFields.push({id,label,type});
+  saveLocal();
+  document.getElementById('s3am-new-label').value='';
+  render3amFieldSettings();
+  render3amFields();
+  showToast('✅ เพิ่มหัวข้อแล้ว','ok');
+}
+
+function remove3amField(i){
+  local.summary3amFields.splice(i,1);
+  saveLocal();
+  render3amFieldSettings();
+  render3amFields();
+  showToast('🗑️ ลบหัวข้อแล้ว','');
+}
+
+function move3amField(i,dir){
+  const arr=local.summary3amFields;
+  const j=i+dir;
+  if(j<0||j>=arr.length)return;
+  [arr[i],arr[j]]=[arr[j],arr[i]];
+  saveLocal();
+  render3amFieldSettings();
+  render3amFields();
+}
+
+async function submit3amSummary(){
+  const fields=local.summary3amFields||[];
+  if(!fields.length)return showToast('ยังไม่มีหัวข้อ — ตั้งค่าในหน้า ⚙️','err');
+  const data={};
+  let hasData=false;
+  fields.forEach(f=>{
+    const el=document.getElementById('s3am-f-'+f.id);
+    if(!el)return;
+    const val=el.value.trim();
+    if(val){hasData=true;}
+    data[f.id]={label:f.label,type:f.type,value:f.type==='number'?(parseFloat(val)||0):val};
+  });
+  if(!hasData)return showToast('กรอกข้อมูลอย่างน้อย 1 หัวข้อ','err');
+
+  const btn=document.getElementById('s3am-btn');
+  btn.disabled=true; btn.textContent='กำลังบันทึก...';
+
+  const log={
+    type:'สรุปยอดตี3',
+    accId:'',accName:'สรุปยอดตี 3',
+    summary3am:data,
+    amount:data['f1']?.value||0,
+    detail:'สรุปยอดตี 3: '+fields.filter(f=>data[f.id]?.value).map(f=>`${f.label}: ${f.type==='number'?fmt(data[f.id].value):data[f.id].value}`).join(' | '),
+    reporter:local.myname||'ไม่ระบุ',
+    shift:selShift||local.shift||'เช้า',
+    time:ts(),createdAt:Date.now()
+  };
+  await fbPush('updates',log);
+
+  // Send to selected TG groups
+  const selGroupIds=[...document.querySelectorAll('#s3am-tg-groups input[type=checkbox]:checked')].map(cb=>cb.getAttribute('data-gid'));
+  for(const gid of selGroupIds) await sendTG(gid,build3amMsg(log,fields));
+
+  // Clear fields
+  fields.forEach(f=>{
+    const el=document.getElementById('s3am-f-'+f.id);
+    if(el)el.value='';
+  });
+  btn.disabled=false; btn.textContent='📊 บันทึกสรุปยอดตี 3';
+  showToast('✅ บันทึกสรุปยอดตี 3 แล้ว','ok');
+}
+
+function build3amMsg(log,fields){
+  const shift=log.shift==='ดึก'?'🌙 กะดึก':'☀️ กะเช้า';
+  let msg=`🌙 *สรุปยอดตี 3 — ${cfg.team}*\n`;
+  msg+=`━━━━━━━━━━━━━━\n`;
+  (fields||[]).forEach(f=>{
+    const d=log.summary3am?.[f.id];
+    if(!d)return;
+    const val=f.type==='number'?fmt(d.value):d.value;
+    if(val&&val!=='฿0') msg+=`📌 *${f.label}:* ${val}\n`;
+  });
+  msg+=`━━━━━━━━━━━━━━\n`;
+  msg+=`👤 *โดย:* ${log.reporter} | ${shift}\n🕐 ${log.time}`;
+  return msg;
+}
+
+function render3amSummaryOnDash(){
+  const el=document.getElementById('d-3am-summary');
+  if(!el)return;
+  // Find most recent 3AM summary
+  const arr=Object.values(updates)
+    .filter(u=>u.type==='สรุปยอดตี3')
+    .sort((a,b)=>b.createdAt-a.createdAt);
+  if(!arr.length){el.innerHTML='';return;}
+  const latest=arr[0];
+  const fields=local.summary3amFields||DEFAULT_3AM_FIELDS;
+  const d=latest.summary3am||{};
+  const boxes=fields.map(f=>{
+    const val=d[f.id]?.value;
+    if(val===undefined||val===null||val==='')return '';
+    const display=f.type==='number'?fmt(val):val;
+    return `<div class="s3am-box"><div class="s3am-lbl">${f.label}</div><div class="s3am-val" style="color:${f.type==='number'?'var(--cyan)':'var(--text)'}">${display}</div></div>`;
+  }).filter(Boolean).join('');
+  if(!boxes){el.innerHTML='';return;}
+  el.innerHTML=`
+    <div class="summary-3am-card">
+      <div class="summary-3am-hd">
+        <div class="summary-3am-title">🌙 สรุปยอดตี 3 ล่าสุด</div>
+        <div class="summary-3am-time">${latest.time||''}</div>
+      </div>
+      <div class="summary-3am-grid">${boxes}</div>
+      <div class="s3am-reporter">โดย ${latest.reporter||'—'} | ${latest.shift==='ดึก'?'🌙 กะดึก':'☀️ กะเช้า'}</div>
+    </div>`;
+}
+
 // ── BRAND MANAGEMENT ──
 function renderBrandSettings(){
   const el=document.getElementById('brand-list-settings');
@@ -530,7 +770,6 @@ function renderBrandSettings(){
         <button class="btn-sm danger" onclick="removeBrand(${i})">🗑️</button>
       </div>`).join('')
     :'<div style="font-size:12px;color:var(--muted)">ยังไม่มีแบรนด์ — เพิ่มแบรนด์เพื่อใช้เลือกตอนสร้างบัญชี</div>';
-  // Update brand selects in modal
   refreshBrandSelect();
 }
 
@@ -543,17 +782,10 @@ function refreshBrandSelect(){
     +brands.map(b=>`<option value="${b}"${b===cur?' selected':''}>${b}</option>`).join('');
 }
 
-function syncBrandInput(val){
-  const inp=document.getElementById('m-brand');
-  if(inp&&val)inp.value=val;
-}
-
+function syncBrandInput(val){const inp=document.getElementById('m-brand');if(inp&&val)inp.value=val;}
 function syncBrandSelect(val){
-  const sel=document.getElementById('m-brand-select');
-  if(!sel)return;
-  // Try to match option
-  const opt=[...sel.options].find(o=>o.value===val);
-  sel.value=opt?val:'';
+  const sel=document.getElementById('m-brand-select');if(!sel)return;
+  const opt=[...sel.options].find(o=>o.value===val);sel.value=opt?val:'';
 }
 
 function addBrand(){
@@ -563,14 +795,9 @@ function addBrand(){
   if(local.brands.includes(name))return showToast('มีแบรนด์นี้แล้ว','warn');
   local.brands.push(name); saveLocal();
   document.getElementById('s-brand-name').value='';
-  renderBrandSettings();
-  showToast('✅ เพิ่มแบรนด์แล้ว','ok');
+  renderBrandSettings(); showToast('✅ เพิ่มแบรนด์แล้ว','ok');
 }
-
-function removeBrand(i){
-  local.brands.splice(i,1); saveLocal(); renderBrandSettings();
-  showToast('🗑️ ลบแบรนด์แล้ว','');
-}
+function removeBrand(i){local.brands.splice(i,1);saveLocal();renderBrandSettings();showToast('🗑️ ลบแบรนด์แล้ว','');}
 
 // ── SHIFT ──
 function pickShift(val,el,cls){
@@ -578,14 +805,12 @@ function pickShift(val,el,cls){
   document.querySelectorAll('#page-update .chip[id^="shift-chip"]').forEach(c=>c.className='chip');
   el.classList.add(cls);
 }
-
 function setShiftSetting(val){
   local.shift=val; saveLocal(); updateShiftDisplay();
   document.querySelectorAll('#s-shift-day,#s-shift-night').forEach(c=>c.className='chip');
   document.getElementById(val==='เช้า'?'s-shift-day':'s-shift-night').classList.add(val==='เช้า'?'sel-yellow':'sel-purple');
   showToast('✅ เปลี่ยนกะเป็น '+(val==='เช้า'?'☀️ กะเช้า':'🌙 กะดึก'),'ok');
 }
-
 function updateShiftDisplay(){
   const s=local.shift||'เช้า';
   const chip=document.getElementById('shift-chip');
@@ -604,18 +829,8 @@ async function fbDel(p){await fetch(fbUrl(p),{method:'DELETE'});}
 
 function fbListen(path,cb){
   const es=new EventSource(DB+'/'+path+'.json');
-  es.addEventListener('put',e=>{
-    try{
-      const data=JSON.parse(e.data).data;
-      cb(data,'put');
-    }catch(x){}
-  });
-  es.addEventListener('patch',e=>{
-    try{
-      const data=JSON.parse(e.data).data;
-      if(data)cb(data,'patch');
-    }catch(x){}
-  });
+  es.addEventListener('put',e=>{try{const data=JSON.parse(e.data).data;cb(data,'put');}catch(x){}});
+  es.addEventListener('patch',e=>{try{const data=JSON.parse(e.data).data;if(data)cb(data,'patch');}catch(x){}});
   es.onerror=()=>setSyncStatus(false);
   es.onopen=()=>setSyncStatus(true);
   return()=>es.close();
@@ -639,53 +854,33 @@ function scheduleRender(){
 function startListeners(){
   unsubFns.push(fbListen('accounts',(d,evType)=>{
     if(evType==='put'){
-      // Full snapshot: only apply if we have no dirty edits open
-      if(dirtyEdits.size===0){
-        accounts=d||{};
-      } else {
-        // Merge carefully: skip fields being edited
+      if(dirtyEdits.size===0){accounts=d||{};}
+      else{
         const incoming=d||{};
         Object.keys(incoming).forEach(k=>{
-          if(dirtyEdits.has(k)){
-            // Keep existing account data, only update non-balance fields from remote
-            accounts[k]={...(accounts[k]||{}), ...incoming[k]};
-          } else {
-            accounts[k]=incoming[k];
-          }
+          if(dirtyEdits.has(k)){accounts[k]={...(accounts[k]||{}),...incoming[k]};}
+          else{accounts[k]=incoming[k];}
         });
-        // Remove deleted accounts
         Object.keys(accounts).forEach(k=>{if(!(k in incoming))delete accounts[k];});
       }
     } else {
-      // patch event: fine-grained update
-      if(d){
-        Object.keys(d).forEach(k=>{
-          if(d[k]===null){ delete accounts[k]; }
-          else {
-            // If this account's panel is open, merge carefully
-            if(dirtyEdits.has(k)){
-              // Only update non-numeric display fields (name, brand, frozen, etc)
-              const safe={};
-              Object.keys(d[k]).forEach(f=>{
-                if(!['balance','limitCash','limitScan','usedCash','usedScan'].includes(f)){
-                  safe[f]=d[k][f];
-                }
-              });
-              accounts[k]={...(accounts[k]||{}), ...safe};
-            } else {
-              accounts[k]={...(accounts[k]||{}), ...d[k]};
-            }
-          }
-        });
-      }
+      if(d){Object.keys(d).forEach(k=>{
+        if(d[k]===null){delete accounts[k];}
+        else{
+          if(dirtyEdits.has(k)){
+            const safe={};
+            Object.keys(d[k]).forEach(f=>{if(!['balance','limitCash','limitScan','usedCash','usedScan'].includes(f)){safe[f]=d[k][f];}});
+            accounts[k]={...(accounts[k]||{}),...safe};
+          } else {accounts[k]={...(accounts[k]||{}),...d[k]};}
+        }
+      });}
     }
     scheduleRender();
   }));
   unsubFns.push(fbListen('updates',(d,evType)=>{
     if(evType==='put'){updates=d||{};}
     else if(d){Object.keys(d).forEach(k=>{if(d[k]===null)delete updates[k]; else updates[k]=d[k];});}
-    renderHistory();
-    renderDashStats();
+    renderHistory(); renderDashStats(); render3amSummaryOnDash();
   }));
   unsubFns.push(fbListen('presence',(d,evType)=>{
     if(evType==='put'){presence=d||{};}
@@ -694,14 +889,9 @@ function startListeners(){
   }));
 }
 
-// Safe render: skip re-rendering inline edit panels that are open (user typing)
 function renderAllSafe(){
-  renderDashboard();
-  renderAccFullSafe();
-  renderHistory();
-  populateSels();
-  renderUpdateTGGroups();
-  renderDashTGGroups();
+  renderDashboard(); renderAccFullSafe(); renderHistory(); populateSels();
+  renderUpdateTGGroups(); renderDashTGGroups(); render3amTGGroups();
 }
 
 async function setPresence(on){
@@ -716,7 +906,6 @@ function startClock(){
     document.getElementById('clock').textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',hour12:false});
   },1000);
 }
-
 function startSchChecker(){
   const t=setInterval(()=>{
     if(!local.schedules||!local.schedules.length)return;
@@ -742,7 +931,7 @@ function todayStr(){return new Date().toLocaleDateString('th-TH',{day:'2-digit',
 // ── RENDER ──
 function renderAll(){
   renderDashboard(); renderAccFull(); renderHistory(); populateSels();
-  renderUpdateTGGroups(); renderDashTGGroups();
+  renderUpdateTGGroups(); renderDashTGGroups(); render3amTGGroups();
 }
 
 function renderDashStats(){
@@ -775,6 +964,7 @@ function renderDashboard(){
   const accs=Object.values(accounts);
   const frozen=accs.filter(a=>a.frozen);
   renderDashStats();
+  render3amSummaryOnDash();
   document.getElementById('d-freeze-alerts').innerHTML=frozen.map(a=>`
     <div class="alert alert-freeze">
       <div class="alert-icon">🔒</div>
@@ -805,7 +995,9 @@ function renderBrandGroups(){
     const totalBal=arr.reduce((s,a)=>s+(Number(a.balance)||0),0);
     const atmLeft=arr.reduce((s,a)=>s+Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0)),0);
     const qrLeft=arr.reduce((s,a)=>s+Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0)),0);
+    const totalCreditLeft=atmLeft+qrLeft;
     const sentCash=arr.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
+    const sentScan=arr.reduce((s,a)=>s+(Number(a.usedScan)||0),0);
     const frozenCount=arr.filter(a=>a.frozen).length;
     const shiftAC=arr.filter(a=>a.accShift==='A').length;
     const shiftBC=arr.filter(a=>a.accShift==='B').length;
@@ -820,9 +1012,11 @@ function renderBrandGroups(){
       </div>
       <div class="brand-group-stats">
         <div class="brand-stat-box"><div class="brand-stat-lbl">💰 เงินคงเหลือ</div><div class="brand-stat-val" style="color:var(--green)">${fmt(totalBal)}</div></div>
+        <div class="brand-stat-box" style="grid-column:span 2"><div class="brand-stat-lbl">📊 วงเงินรวมเหลือ (ATM+โอนออก)</div><div class="brand-stat-val" style="color:var(--cyan)">${fmt(totalCreditLeft)}</div></div>
         <div class="brand-stat-box"><div class="brand-stat-lbl">💳 ATM เหลือ</div><div class="brand-stat-val" style="color:var(--blue)">${fmt(atmLeft)}</div></div>
-        <div class="brand-stat-box"><div class="brand-stat-lbl">📲 QR เหลือ</div><div class="brand-stat-val" style="color:var(--purple)">${fmt(qrLeft)}</div></div>
-        <div class="brand-stat-box" style="grid-column:span 2"><div class="brand-stat-lbl">💸 ส่งกดรวม</div><div class="brand-stat-val" style="color:var(--yellow)">${fmt(sentCash)}</div></div>
+        <div class="brand-stat-box"><div class="brand-stat-lbl">📲 โอนออก เหลือ</div><div class="brand-stat-val" style="color:var(--purple)">${fmt(qrLeft)}</div></div>
+        <div class="brand-stat-box"><div class="brand-stat-lbl">💸 ส่งกดรวม</div><div class="brand-stat-val" style="color:var(--yellow)">${fmt(sentCash)}</div></div>
+        <div class="brand-stat-box"><div class="brand-stat-lbl">📤 โอนออกรวม</div><div class="brand-stat-val" style="color:var(--yellow)">${fmt(sentScan)}</div></div>
         <div class="brand-stat-box"><div class="brand-stat-lbl">🔒 อายัด</div><div class="brand-stat-val" style="color:${frozenCount?'var(--red)':'var(--muted)'}">${frozenCount}</div></div>
         <div class="brand-stat-box"><div class="brand-stat-lbl">🌅 กะ A</div><div class="brand-stat-val" style="color:var(--yellow)">${shiftAC}</div></div>
         <div class="brand-stat-box"><div class="brand-stat-lbl">🌙 กะ B</div><div class="brand-stat-val" style="color:var(--purple)">${shiftBC}</div></div>
@@ -863,28 +1057,17 @@ function accMini(a){
   </div>`;
 }
 
-// ── ACC FULL (with dirty-check) ──
+// ── ACC FULL ──
 function renderAccFullSafe(){
   const arr=Object.values(accounts);
-  const el=document.getElementById('acc-full');
-  if(!el)return;
-  // For each account, check if its inline panel is open (dirty)
   arr.forEach(a=>{
     const panel=document.getElementById('inline-edit-'+a.id);
     if(panel&&panel.style.display!=='none'){
-      // Panel is open - update only the non-panel parts
       const card=document.getElementById('acc-card-'+a.id);
-      if(card){
-        // Just update the balance display, not the whole card
-        const balEl=card.querySelector('.dyn-balance');
-        if(balEl)balEl.textContent=fmt(a.balance);
-      }
+      if(card){const balEl=card.querySelector('.dyn-balance');if(balEl)balEl.textContent=fmt(a.balance);}
     }
   });
-  // Full re-render only if no panels open
-  if(dirtyEdits.size===0){
-    renderAccFull();
-  }
+  if(dirtyEdits.size===0) renderAccFull();
 }
 
 function renderAccFull(){
@@ -902,78 +1085,68 @@ function accFull(a){
   const sPct=scanLim?Math.min(100,(scanUsed/scanLim)*100):0;
   const cCol=cPct>80?'var(--red)':cPct>50?'var(--yellow)':'var(--green)';
   const sCol=sPct>80?'var(--red)':sPct>50?'var(--yellow)':'var(--green)';
-  const badge=frozen?'<span class="badge bg-red">\uD83D\uDD12 อายัด</span>':'<span class="badge bg-green">\u25CF ปกติ</span>';
+  const badge=frozen?'<span class="badge bg-red">🔒 อายัด</span>':'<span class="badge bg-green">● ปกติ</span>';
   const freezeBtn=frozen
-    ?`<button class="btn-sm success" onclick="setFreeze('${id}',false)">\uD83D\uDD13 ปลดอายัด</button>`
-    :`<button class="btn-sm danger" onclick="setFreeze('${id}',true)">\uD83D\uDD12 อายัด</button>`;
-
+    ?`<button class="btn-sm success" onclick="setFreeze('${id}',false)">🔓 ปลดอายัด</button>`
+    :`<button class="btn-sm danger" onclick="setFreeze('${id}',true)">🔒 อายัด</button>`;
   const inputStyle='width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:7px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;box-sizing:border-box;';
-
   return (
     `<div id="acc-card-${id}" style="background:var(--s2);border:1px solid ${frozen?'rgba(240,79,79,.5)':'var(--bd)'};border-radius:11px;padding:13px;margin-bottom:10px;width:100%;box-sizing:border-box;">` +
-
     `<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:6px;">` +
       `<div style="min-width:0;flex:1;">` +
         `<div style="font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.name||'—'}</div>` +
-        (a.brand?`<div style="font-size:11px;color:var(--purple);font-weight:600;margin-top:1px;">\uD83C\uDFF7 ${a.brand}</div>`:'') +
-        `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:1px;">${a.bank||''}${a.num?' \u00B7 ****'+a.num:''}</div>` +
-        (a.detail?`<div style="font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;">\uD83D\uDCDD ${a.detail}</div>`:'') +
-        (a.accShift?`<div style="display:inline-block;margin-top:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;${a.accShift==='A'?'background:rgba(245,183,49,.15);color:var(--yellow)':'background:rgba(155,108,255,.15);color:var(--purple)'}">${a.accShift==='A'?'\uD83C\uDF05 \uD83D\uDD22\uFE0F\u0E01\u0E30 A':'\uD83C\uDF19 \uD83D\uDD22\uFE0F\u0E01\u0E30 B'}</div>`:'') +
+        (a.brand?`<div style="font-size:11px;color:var(--purple);font-weight:600;margin-top:1px;">🏷 ${a.brand}</div>`:'') +
+        `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:1px;">${a.bank||''}${a.num?' · ****'+a.num:''}</div>` +
+        (a.detail?`<div style="font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;">📝 ${a.detail}</div>`:'') +
+        (a.accShift?`<div style="display:inline-block;margin-top:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;${a.accShift==='A'?'background:rgba(245,183,49,.15);color:var(--yellow)':'background:rgba(155,108,255,.15);color:var(--purple)'}">${a.accShift==='A'?'🌅 กะ A':'🌙 กะ B'}</div>`:'') +
       `</div>` +
       badge +
     `</div>` +
-
     `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;width:100%;">` +
       `<div style="background:var(--s3);border-radius:8px;padding:9px 10px;min-width:0;">` +
-        `<div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB0 เงินคงเหลือ</div>` +
+        `<div style="font-size:10px;color:var(--muted);margin-bottom:3px;">💰 เงินคงเหลือ</div>` +
         `<div class="dyn-balance" style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--green);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${fmt(a.balance)}</div>` +
       `</div>` +
       `<div style="background:var(--s3);border-radius:8px;padding:9px 10px;min-width:0;">` +
-        `<div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCCA วงเงินบัญชีเหลือ</div>` +
-        `<div style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--blue);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${fmt(cashLeft)}</div>` +
-        `<div style="font-size:10px;color:var(--muted);margin-top:2px;">จาก ${fmt(cashLim)}</div>` +
+        `<div style="font-size:10px;color:var(--muted);margin-bottom:3px;">📊 วงเงินรวมเหลือ</div>` +
+        `<div style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--cyan);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${fmt(cashLeft+scanLeft)}</div>` +
       `</div>` +
     `</div>` +
-
     `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;width:100%;">` +
       `<div style="background:var(--s3);border-radius:8px;padding:8px 10px;min-width:0;">` +
-        `<div style="font-size:10px;color:var(--muted);margin-bottom:2px;">\uD83D\uDCB3 วงเงินกด (ATM)</div>` +
+        `<div style="font-size:10px;color:var(--muted);margin-bottom:2px;">💳 วงเงินกด (ATM)</div>` +
         `<div style="font-family:var(--mono);font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${fmt(cashLim)}</div>` +
         `<div style="background:var(--bg);border-radius:3px;height:4px;overflow:hidden;margin-top:5px;width:100%;"><div style="height:100%;border-radius:3px;width:${cPct.toFixed(1)}%;background:${cCol};"></div></div>` +
-        `<div style="font-size:10px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">ใช้ ${fmt(cashUsed)} \u00B7 เหลือ ${fmt(cashLeft)}</div>` +
+        `<div style="font-size:10px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">ใช้ ${fmt(cashUsed)} · เหลือ ${fmt(cashLeft)}</div>` +
       `</div>` +
       `<div style="background:var(--s3);border-radius:8px;padding:8px 10px;min-width:0;">` +
-        `<div style="font-size:10px;color:var(--muted);margin-bottom:2px;">\uD83D\uDCF2 วงเงินสแกน (QR)</div>` +
+        `<div style="font-size:10px;color:var(--muted);margin-bottom:2px;">📲 วงเงินโอนออก</div>` +
         `<div style="font-family:var(--mono);font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${fmt(scanLim)}</div>` +
         `<div style="background:var(--bg);border-radius:3px;height:4px;overflow:hidden;margin-top:5px;width:100%;"><div style="height:100%;border-radius:3px;width:${sPct.toFixed(1)}%;background:${sCol};"></div></div>` +
-        `<div style="font-size:10px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">ใช้ ${fmt(scanUsed)} \u00B7 เหลือ ${fmt(scanLeft)}</div>` +
+        `<div style="font-size:10px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">ใช้ ${fmt(scanUsed)} · เหลือ ${fmt(scanLeft)}</div>` +
       `</div>` +
     `</div>` +
-
-    // Inline edit panel
     `<div id="inline-edit-${id}" style="display:none;background:var(--s3);border-radius:10px;padding:13px;margin-bottom:10px;width:100%;box-sizing:border-box;">` +
-      `<div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:10px;">\u270F\uFE0F แก้ไขยอด</div>` +
+      `<div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:10px;">✏️ แก้ไขยอด</div>` +
       `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;width:100%;">` +
-        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB0 เงินคงเหลือ (${fmt(Number(a.balance)||0)})</div><input type="number" id="ei-bal-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
-        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB3 วงเงิน ATM (${fmt(cashLim)})</div><input type="number" id="ei-lcash-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
-        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCF2 วงเงิน QR (${fmt(scanLim)})</div><input type="number" id="ei-lscan-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
-        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCB8 ยอดใช้ ATM (${fmt(cashUsed)})</div><input type="number" id="ei-ucash-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
-        `<div style="grid-column:span 2;"><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">\uD83D\uDCE4 ยอดโอน QR (${fmt(scanUsed)})</div><input type="number" id="ei-uscan-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
+        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">💰 เงินคงเหลือ (${fmt(Number(a.balance)||0)})</div><input type="number" id="ei-bal-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
+        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">💳 วงเงิน ATM (${fmt(cashLim)})</div><input type="number" id="ei-lcash-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
+        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">📲 วงเงินโอนออก (${fmt(scanLim)})</div><input type="number" id="ei-lscan-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
+        `<div><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">💸 ยอดใช้ ATM (${fmt(cashUsed)})</div><input type="number" id="ei-ucash-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
+        `<div style="grid-column:span 2;"><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">📤 ยอดโอนออก (${fmt(scanUsed)})</div><input type="number" id="ei-uscan-${id}" placeholder="กรอกยอดใหม่" style="${inputStyle}" oninput="markDirty('${id}')"></div>` +
       `</div>` +
       `<input type="text" id="ei-note-${id}" placeholder="หมายเหตุ (ไม่บังคับ)" style="${inputStyle.replace('font-family:var(--mono);','font-family:var(--font);')}margin-bottom:10px;">` +
       `<div style="display:flex;gap:8px;">` +
-        `<button onclick="saveInlineEdit('${id}')" style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;font-family:var(--font);cursor:pointer;">\uD83D\uDCBE บันทึก</button>` +
-        `<button onclick="toggleEditPanel('${id}')" style="background:var(--s2);color:var(--muted);border:1px solid var(--bd2);border-radius:8px;padding:10px 16px;font-size:13px;font-family:var(--font);cursor:pointer;">\u2715 ยกเลิก</button>` +
+        `<button onclick="saveInlineEdit('${id}')" style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;font-family:var(--font);cursor:pointer;">💾 บันทึก</button>` +
+        `<button onclick="toggleEditPanel('${id}')" style="background:var(--s2);color:var(--muted);border:1px solid var(--bd2);border-radius:8px;padding:10px 16px;font-size:13px;font-family:var(--font);cursor:pointer;">✕ ยกเลิก</button>` +
       `</div>` +
     `</div>` +
-
     `<div style="display:flex;gap:7px;flex-wrap:wrap;width:100%;">` +
-      `<button class="btn-sm" onclick="toggleEditPanel('${id}')" style="flex:1;">\u270F\uFE0F แก้ไขยอด</button>` +
-      `<button class="btn-sm" onclick="openEditAcc('${id}')">\uD83D\uDCDD แก้ไขข้อมูล</button>` +
+      `<button class="btn-sm" onclick="toggleEditPanel('${id}')" style="flex:1;">✏️ แก้ไขยอด</button>` +
+      `<button class="btn-sm" onclick="openEditAcc('${id}')">📝 แก้ไขข้อมูล</button>` +
       freezeBtn +
-      `<button class="btn-sm danger" onclick="delAcc('${id}')">\uD83D\uDDD1\uFE0F</button>` +
+      `<button class="btn-sm danger" onclick="delAcc('${id}')">🗑️</button>` +
     `</div>` +
-
     `</div>`
   );
 }
@@ -984,25 +1157,40 @@ function markClean(id){dirtyEdits.delete(id);}
 function renderOnline(){
   const on=Object.values(presence).filter(p=>p.online&&(Date.now()-p.t<90000));
   document.getElementById('online-row').innerHTML=on.length
-    ?on.map(p=>{const shiftIcon=p.shift==='\u0E14\u0E36\u0E01'?'\uD83C\uDF19':'\u2600\uFE0F';const shiftTxt=p.shift?` <span style="font-size:10px;color:var(--muted)">(${shiftIcon})</span>`:'';return `<div class="online-chip"><div class="online-dot"></div>${p.name}${shiftTxt}</div>`;}).join('')
+    ?on.map(p=>{const shiftIcon=p.shift==='ดึก'?'🌙':'☀️';const shiftTxt=p.shift?` <span style="font-size:10px;color:var(--muted)">(${shiftIcon})</span>`:'';return `<div class="online-chip"><div class="online-dot"></div>${p.name}${shiftTxt}</div>`;}).join('')
     :'<div style="font-size:12px;color:var(--muted)">ไม่มีใครออนไลน์</div>';
 }
 
 function renderHistory(){
   let arr=Object.values(updates).sort((a,b)=>b.createdAt-a.createdAt);
   if(histFilter!=='all')arr=arr.filter(u=>u.type===histFilter);
-  const tColor={'บัญชีถูกอายัด':'bg-red','ยอดเงิน':'bg-blue','ส่งกดเงิน':'bg-green','โอนออก QR':'bg-purple','เพิ่มบัญชี':'bg-green','แก้ไขยอด':'bg-blue','อื่นๆ':'bg-yellow'};
+  const tColor={'บัญชีถูกอายัด':'bg-red','ยอดเงิน':'bg-blue','ส่งกดเงิน':'bg-green','โอนออก':'bg-purple','เพิ่มบัญชี':'bg-green','แก้ไขยอด':'bg-blue','สรุปยอดตี3':'bg-cyan','อื่นๆ':'bg-yellow'};
   document.getElementById('hist-list').innerHTML=arr.length
-    ?arr.slice(0,60).map(u=>`
-      <div class="hist-item">
-        <div class="hist-top"><span class="hist-name">${u.accName||'ไม่ระบุบัญชี'}</span><span class="badge ${tColor[u.type]||'bg-yellow'}">${u.type}</span></div>
-        ${u.amount?`<div class="hist-amount" style="color:var(--green)">${fmt(u.amount)}</div>`:''}
-        <div class="hist-detail">${u.detail||''}</div>
-        <div style="display:flex;justify-content:space-between;margin-top:4px">
-          <span style="font-size:11px;color:var(--muted)">โดย ${u.reporter||'—'}${u.shift?' (กะ'+u.shift+')':''}</span>
-          <span class="hist-time">${u.time||''}</span>
-        </div>
-      </div>`).join('')
+    ?arr.slice(0,60).map(u=>{
+        if(u.type==='สรุปยอดตี3'){
+          const fields=local.summary3amFields||DEFAULT_3AM_FIELDS;
+          const d=u.summary3am||{};
+          const lines=fields.filter(f=>d[f.id]?.value!==undefined&&d[f.id]?.value!==''&&d[f.id]?.value!==0)
+            .map(f=>`<span style="display:inline-block;margin-right:10px;"><span style="color:var(--muted)">${f.label}:</span> <span style="font-family:var(--mono);font-weight:600;color:var(--cyan)">${f.type==='number'?fmt(d[f.id].value):d[f.id].value}</span></span>`).join('');
+          return `<div class="hist-3am">
+            <div class="hist-top"><span class="hist-name">🌙 สรุปยอดตี 3</span><span class="badge bg-cyan">ตี 3</span></div>
+            <div style="font-size:12px;line-height:1.8;margin-top:5px;">${lines||'<span style="color:var(--muted)">ไม่มีข้อมูล</span>'}</div>
+            <div style="display:flex;justify-content:space-between;margin-top:5px">
+              <span style="font-size:11px;color:var(--muted)">โดย ${u.reporter||'—'}${u.shift?' (กะ'+u.shift+')':''}</span>
+              <span class="hist-time">${u.time||''}</span>
+            </div>
+          </div>`;
+        }
+        return `<div class="hist-item">
+          <div class="hist-top"><span class="hist-name">${u.accName||'ไม่ระบุบัญชี'}</span><span class="badge ${tColor[u.type]||'bg-yellow'}">${u.type}</span></div>
+          ${u.amount?`<div class="hist-amount" style="color:var(--green)">${fmt(u.amount)}</div>`:''}
+          <div class="hist-detail">${u.detail||''}</div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px">
+            <span style="font-size:11px;color:var(--muted)">โดย ${u.reporter||'—'}${u.shift?' (กะ'+u.shift+')':''}</span>
+            <span class="hist-time">${u.time||''}</span>
+          </div>
+        </div>`;
+      }).join('')
     :'<div class="empty"><div class="empty-icon">📋</div>ไม่มีข้อมูล</div>';
 }
 
@@ -1041,6 +1229,14 @@ function renderUpdateTGGroups(){
     :'<div style="font-size:12px;color:var(--muted)">ยังไม่มีกลุ่ม — ตั้งค่าในหน้า ⚙️</div>';
 }
 
+function render3amTGGroups(){
+  const el=document.getElementById('s3am-tg-groups');
+  if(!el)return;
+  el.innerHTML=(local.tgGroups||[]).length
+    ?local.tgGroups.map((g,i)=>`<div class="tg-group-check"><input type="checkbox" id="s3amtg-idx-${i}" data-gid="${g.id}" checked><label for="s3amtg-idx-${i}" style="font-size:13px;cursor:pointer">${g.name}</label></div>`).join('')
+    :'<div style="font-size:12px;color:var(--muted)">ยังไม่มีกลุ่ม — ตั้งค่าในหน้า ⚙️</div>';
+}
+
 function renderDashTGGroups(){
   const el=document.getElementById('dash-tg-groups');
   el.innerHTML=(local.tgGroups||[]).length
@@ -1051,9 +1247,7 @@ function renderDashTGGroups(){
 function renderFreezeAlertGroups(){
   const el=document.getElementById('freeze-alert-groups');
   if(!el)return;
-  if(!local.tgGroups||!local.tgGroups.length){
-    el.innerHTML='<div style="font-size:12px;color:var(--muted)">ยังไม่มีกลุ่ม — เพิ่มกลุ่มก่อน</div>'; return;
-  }
+  if(!local.tgGroups||!local.tgGroups.length){el.innerHTML='<div style="font-size:12px;color:var(--muted)">ยังไม่มีกลุ่ม — เพิ่มกลุ่มก่อน</div>';return;}
   if(!local.freezeAlertGroups)local.freezeAlertGroups=[];
   el.innerHTML=local.tgGroups.map(g=>`
     <div class="tg-group-check">
@@ -1100,10 +1294,10 @@ function addTGGroup(){
   local.tgGroups.push({name,id}); saveLocal();
   document.getElementById('tg-gname').value='';
   document.getElementById('tg-gid').value='';
-  renderTGGroups(); renderUpdateTGGroups(); renderDashTGGroups();
+  renderTGGroups(); renderUpdateTGGroups(); renderDashTGGroups(); render3amTGGroups();
   showToast('✅ เพิ่มกลุ่มแล้ว','ok');
 }
-function removeTGGroup(i){local.tgGroups.splice(i,1);saveLocal();renderTGGroups();renderUpdateTGGroups();renderDashTGGroups();}
+function removeTGGroup(i){local.tgGroups.splice(i,1);saveLocal();renderTGGroups();renderUpdateTGGroups();renderDashTGGroups();render3amTGGroups();}
 function addSchedule(){
   const time=document.getElementById('sch-time').value;
   const groupId=document.getElementById('sch-group').value;
@@ -1151,8 +1345,7 @@ function pickType(val,el,cls){
 function pickAccShift(val,el){
   document.getElementById('m-shift-val').value=val;
   ['m-shift-a','m-shift-b','m-shift-none'].forEach(id=>{
-    const e=document.getElementById(id);
-    if(e) e.className='chip';
+    const e=document.getElementById(id); if(e) e.className='chip';
   });
   if(val==='A') el.className='chip sel-yellow';
   else if(val==='B') el.className='chip sel-purple';
@@ -1162,8 +1355,7 @@ function pickAccShift(val,el){
 function setModalShift(val){
   document.getElementById('m-shift-val').value=val||'';
   ['m-shift-a','m-shift-b','m-shift-none'].forEach(id=>{
-    const e=document.getElementById(id);
-    if(e) e.className='chip';
+    const e=document.getElementById(id); if(e) e.className='chip';
   });
   if(val==='A'){const e=document.getElementById('m-shift-a');if(e)e.className='chip sel-yellow';}
   else if(val==='B'){const e=document.getElementById('m-shift-b');if(e)e.className='chip sel-purple';}
@@ -1184,7 +1376,7 @@ async function submitUpdate(){
   if(selType==='บัญชีถูกอายัด'&&accId){
     await fbSet('accounts/'+accId+'/frozen',true);
     if(local.token){
-      const fLog={type:'บัญชีถูกอายัด',accId,accName:acc?.name||'',accBank:acc?.bank||'',accBrand:acc?.brand||'',amount:0,detail:document.getElementById('ut-detail').value.trim()||`บัญชี ${acc?.name||''} ถูกอายัด`,reporter:local.myname||'—',shift,time:ts(),createdAt:Date.now()};
+      const fLog={type:'บัญชีถูกอายัด',accId,accName:acc?.name||'',accBank:acc?.bank||'',accBrand:acc?.brand||'',amount:0,detail:detail||`บัญชี ${acc?.name||''} ถูกอายัด`,reporter:local.myname||'—',shift,time:ts(),createdAt:Date.now()};
       const alertGroups=(local.freezeAlertGroups&&local.freezeAlertGroups.length>0)
         ?local.tgGroups.filter(g=>local.freezeAlertGroups.includes(g.id))
         :local.tgGroups||[];
@@ -1194,7 +1386,7 @@ async function submitUpdate(){
   if(selType==='ส่งกดเงิน'&&accId&&amount>0){
     await fbSet('accounts/'+accId+'/usedCash',(Number(acc?.usedCash)||0)+amount);
   }
-  if(selType==='โอนออก QR'&&accId&&amount>0){
+  if(selType==='โอนออก'&&accId&&amount>0){
     await fbSet('accounts/'+accId+'/usedScan',(Number(acc?.usedScan)||0)+amount);
   }
   if(selType==='ยอดเงิน'&&accId&&amount>0){
@@ -1215,7 +1407,7 @@ async function submitUpdate(){
 }
 
 function buildMsg(log){
-  const e={'บัญชีถูกอายัด':'🚨','ยอดเงิน':'💰','ส่งกดเงิน':'💳','โอนออก QR':'📲','อื่นๆ':'📌'}[log.type]||'📌';
+  const e={'บัญชีถูกอายัด':'🚨','ยอดเงิน':'💰','ส่งกดเงิน':'💳','โอนออก':'📲','อื่นๆ':'📌'}[log.type]||'📌';
   const shiftLabel=log.shift==='ดึก'?'🌙 กะดึก':'☀️ กะเช้า';
   return `${e} *${log.type} — ${cfg.team}*\n\n🏦 *บัญชี:* ${log.accName||'ไม่ระบุ'}${log.accBrand?' ('+log.accBrand+')':''}\n`
     +(log.amount?`💵 *ยอดเงิน:* ${fmt(log.amount)}\n`:'')
@@ -1226,17 +1418,7 @@ function buildMsg(log){
 
 function buildFreezeMsg(log){
   const shiftLabel=log.shift==='ดึก'?'🌙 กะดึก':'☀️ กะเช้า';
-  return `🚨🚨🚨 *แจ้งด่วน — บัญชีถูกอายัด!*
-*ทีม: ${cfg.team}*
-
-🏦 *บัญชี:* ${log.accName||'ไม่ระบุ'}
-${log.accBank?`🏛 *ธนาคาร:* ${log.accBank}
-`:''}${log.accBrand?`🏷 *แบรนด์:* ${log.accBrand}
-`:''}
-👤 *ผู้แจ้ง:* ${log.reporter} | ${shiftLabel}
-🕐 ${log.time}
-
-⚠️ กรุณาดำเนินการทันที!`;
+  return `🚨🚨🚨 *แจ้งด่วน — บัญชีถูกอายัด!*\n*ทีม: ${cfg.team}*\n\n🏦 *บัญชี:* ${log.accName||'ไม่ระบุ'}\n${log.accBank?`🏛 *ธนาคาร:* ${log.accBank}\n`:''}${log.accBrand?`🏷 *แบรนด์:* ${log.accBrand}\n`:''}\n👤 *ผู้แจ้ง:* ${log.reporter} | ${shiftLabel}\n🕐 ${log.time}\n\n⚠️ กรุณาดำเนินการทันที!`;
 }
 
 // ── TG SEND ──
@@ -1256,44 +1438,37 @@ async function sendDashNow(){
 async function sendDashToGroup(groupId,note){
   const accs=Object.values(accounts);
   const frozen=accs.filter(a=>a.frozen);
-  const totalBal=accs.reduce((s,a)=>s+(Number(a.balance)||0),0);
-  const atmAccs=accs.filter(a=>Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0))>0);
-  const totalAtmLeft=atmAccs.reduce((s,a)=>s+((Number(a.limitCash)||0)-(Number(a.usedCash)||0)),0);
-  const qrAccs=accs.filter(a=>Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0))>0);
-  const totalQrLeft=qrAccs.reduce((s,a)=>s+((Number(a.limitScan)||0)-(Number(a.usedScan)||0)),0);
   const totalSentCash=accs.reduce((s,a)=>s+(Number(a.usedCash)||0),0);
-  const tgShiftA=accs.filter(a=>a.accShift==='A').length;
-  const tgShiftB=accs.filter(a=>a.accShift==='B').length;
+  const totalSentScan=accs.reduce((s,a)=>s+(Number(a.usedScan)||0),0);
 
-  // Bank breakdown by shift
-  const bankShiftMap={};
+  // Per-brand: total credit left (ATM + โอนออก combined), frozen count
+  const brandMap={};
   accs.forEach(a=>{
-    const bank=a.bank||'ไม่ระบุ';
-    const shift=a.accShift||'ไม่ระบุกะ';
-    const key=bank+'|'+shift;
-    if(!bankShiftMap[key])bankShiftMap[key]={bank,shift,count:0};
-    bankShiftMap[key].count++;
+    const brand=(a.brand||'ไม่ระบุแบรนด์').trim();
+    if(!brandMap[brand])brandMap[brand]={atmLeft:0,scanLeft:0,frozenCount:0,count:0,sentCash:0,sentScan:0};
+    brandMap[brand].atmLeft+=Math.max(0,(Number(a.limitCash)||0)-(Number(a.usedCash)||0));
+    brandMap[brand].scanLeft+=Math.max(0,(Number(a.limitScan)||0)-(Number(a.usedScan)||0));
+    brandMap[brand].sentCash+=Number(a.usedCash)||0;
+    brandMap[brand].sentScan+=Number(a.usedScan)||0;
+    if(a.frozen)brandMap[brand].frozenCount++;
+    brandMap[brand].count++;
   });
-  // Sort: shift A first, then B, then others; within same shift sort by count desc
-  const shiftOrder={'A':0,'B':1,'ไม่ระบุกะ':2};
-  const bankLines=Object.values(bankShiftMap)
-    .sort((x,y)=>(shiftOrder[x.shift]??2)-(shiftOrder[y.shift]??2)||y.count-x.count)
-    .map(r=>{
-      const icon=r.shift==='A'?'🌅':r.shift==='B'?'🌙':'·';
-      return `  ${icon} ${r.bank} ${r.count} บัญชี (กะ${r.shift})`;
-    }).join('\n');
 
   let msg=`📊 *${cfg.team}* | ${ts()}\n`;
   msg+=`━━━━━━━━━━━━━━\n`;
   msg+=`🏦 *${accs.length}* บัญชีทั้งหมด\n`;
-  msg+=`💰 *${fmt(totalBal)}* ยอดรวมคงเหลือ\n`;
-  msg+=`🔒 *${frozen.length}* บัญชีถูกอายัด\n`;
-  msg+=`💳 *${fmt(totalAtmLeft)}* / ${atmAccs.length} บัญชี วงเงินกด ATM\n`;
-  msg+=`📲 *${fmt(totalQrLeft)}* / ${qrAccs.length} บัญชี วงเงิน QR\n`;
-  msg+=`💸 *${fmt(totalSentCash)}* ยอดส่งกดรวม\n`;
-  msg+=`🌅 *${tgShiftA}* บัญชีกะ A  🌙 *${tgShiftB}* บัญชีกะ B\n`;
+  msg+=`🔒 *บัญชีถูกอายัด: ${frozen.length}* บัญชี\n`;
   msg+=`━━━━━━━━━━━━━━\n`;
-  msg+=bankLines;
+  msg+=`*วงเงินรวมเหลือ รายแบรนด์*\n`;
+  Object.entries(brandMap).forEach(([brand,d])=>{
+    const total=d.atmLeft+d.scanLeft;
+    msg+=`🏷 *${brand}* (${d.count} บัญชี${d.frozenCount?` · 🔒${d.frozenCount}`:''})\n`;
+    msg+=`  📊 วงเงินรวมเหลือ: *${fmt(total)}*\n`;
+    msg+=`  💳 ATM เหลือ: ${fmt(d.atmLeft)}  📲 โอนออก เหลือ: ${fmt(d.scanLeft)}\n`;
+  });
+  msg+=`━━━━━━━━━━━━━━\n`;
+  msg+=`💸 *ยอดส่งกดรวม: ${fmt(totalSentCash)}*\n`;
+  msg+=`📤 *ยอดโอนออกรวม: ${fmt(totalSentScan)}*\n`;
   await sendTG(groupId,msg);
 }
 
@@ -1304,15 +1479,13 @@ function openAddAcc(){
   document.getElementById('m-edit-id').value='';
   ['m-name','m-brand','m-detail','m-num','m-balance','m-lcash','m-lscan'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('m-bank').value='';
-  setModalShift('');
-  refreshBrandSelect();
+  setModalShift(''); refreshBrandSelect();
   document.getElementById('m-brand').value='';
   document.getElementById('modal-acc').classList.add('open');
 }
 
 function openEditAcc(id){
-  const a=accounts[id];
-  if(!a)return;
+  const a=accounts[id]; if(!a)return;
   document.getElementById('modal-acc-title').textContent='✏️ แก้ไขข้อมูลบัญชี';
   document.getElementById('m-save-btn').textContent='💾 บันทึกการแก้ไข';
   document.getElementById('m-edit-id').value=id;
@@ -1325,9 +1498,7 @@ function openEditAcc(id){
   document.getElementById('m-lcash').value=a.limitCash||'';
   document.getElementById('m-lscan').value=a.limitScan||'';
   setModalShift(a.accShift||'');
-  document.getElementById('m-brand').value=a.brand||'';
   refreshBrandSelect();
-  // set select to match brand
   const bSel=document.getElementById('m-brand-select');
   if(bSel){const opt=[...bSel.options].find(o=>o.value===(a.brand||''));bSel.value=opt?a.brand:'';}
   document.getElementById('modal-acc').classList.add('open');
@@ -1339,18 +1510,13 @@ async function saveAccount(){
   if(!name)return showToast('กรอกชื่อบัญชีด้วย','err');
 
   if(editId){
-    // Edit existing
     const a=accounts[editId]||{};
     const newBrand=document.getElementById('m-brand').value.trim();
     const oldBrand=a.brand||'';
     const newAccShift=document.getElementById('m-shift-val').value;
     const updates2={
-      name,
-      brand:newBrand,
-      detail:document.getElementById('m-detail').value.trim(),
-      bank:document.getElementById('m-bank').value,
-      num:document.getElementById('m-num').value.trim(),
-      accShift:newAccShift,
+      name,brand:newBrand,detail:document.getElementById('m-detail').value.trim(),
+      bank:document.getElementById('m-bank').value,num:document.getElementById('m-num').value.trim(),accShift:newAccShift,
     };
     const bal=document.getElementById('m-balance').value;
     const lcash=document.getElementById('m-lcash').value;
@@ -1358,9 +1524,7 @@ async function saveAccount(){
     if(bal!=='')updates2.balance=parseFloat(bal)||0;
     if(lcash!=='')updates2.limitCash=parseFloat(lcash)||0;
     if(lscan!=='')updates2.limitScan=parseFloat(lscan)||0;
-    for(const[k,v]of Object.entries(updates2)){
-      await fbSet('accounts/'+editId+'/'+k,v);
-    }
+    for(const[k,v]of Object.entries(updates2)){await fbSet('accounts/'+editId+'/'+k,v);}
     const changes=[];
     if(name!==a.name)changes.push(`ชื่อ: ${a.name}→${name}`);
     if(newBrand!==oldBrand)changes.push(`แบรนด์: ${oldBrand||'ไม่ระบุ'}→${newBrand||'ไม่ระบุ'}`);
@@ -1368,13 +1532,11 @@ async function saveAccount(){
     await fbPush('updates',editLog);
     showToast('✅ แก้ไขข้อมูลแล้ว','ok');
   } else {
-    // Add new
     const id='acc_'+Date.now();
     await fbSet('accounts/'+id,{
       id,name,brand:document.getElementById('m-brand').value.trim(),
       detail:document.getElementById('m-detail').value.trim(),
-      bank:document.getElementById('m-bank').value,
-      num:document.getElementById('m-num').value.trim(),
+      bank:document.getElementById('m-bank').value,num:document.getElementById('m-num').value.trim(),
       accShift:document.getElementById('m-shift-val').value,
       balance:parseFloat(document.getElementById('m-balance').value)||0,
       limitCash:parseFloat(document.getElementById('m-lcash').value)||0,
@@ -1415,26 +1577,23 @@ function toggleEditPanel(id){
   if(!panel)return;
   const isOpen=panel.style.display!=='none';
   panel.style.display=isOpen?'none':'block';
-  if(isOpen){
-    markClean(id);
-  } else {
+  if(isOpen){markClean(id);}
+  else{
     markDirty(id);
     ['ei-bal-','ei-lcash-','ei-lscan-','ei-ucash-','ei-uscan-','ei-note-'].forEach(prefix=>{
-      const el=document.getElementById(prefix+id);
-      if(el)el.value='';
+      const el=document.getElementById(prefix+id);if(el)el.value='';
     });
   }
 }
 
 async function saveInlineEdit(id){
-  const a=accounts[id];
-  if(!a)return;
+  const a=accounts[id]; if(!a)return;
   const fields=[
-    {prefix:'ei-bal-',   fbPath:'balance',   label:'เงินคงเหลือ',   cur:Number(a.balance)||0},
-    {prefix:'ei-lcash-', fbPath:'limitCash', label:'วงเงินกด ATM',  cur:Number(a.limitCash)||0},
-    {prefix:'ei-lscan-', fbPath:'limitScan', label:'วงเงิน QR',      cur:Number(a.limitScan)||0},
+    {prefix:'ei-bal-',   fbPath:'balance',   label:'เงินคงเหลือ',     cur:Number(a.balance)||0},
+    {prefix:'ei-lcash-', fbPath:'limitCash', label:'วงเงินกด ATM',    cur:Number(a.limitCash)||0},
+    {prefix:'ei-lscan-', fbPath:'limitScan', label:'วงเงินโอนออก',    cur:Number(a.limitScan)||0},
     {prefix:'ei-ucash-', fbPath:'usedCash',  label:'ยอดใช้ ATM',      cur:Number(a.usedCash)||0},
-    {prefix:'ei-uscan-', fbPath:'usedScan',  label:'ยอดโอน QR',       cur:Number(a.usedScan)||0},
+    {prefix:'ei-uscan-', fbPath:'usedScan',  label:'ยอดโอนออก',       cur:Number(a.usedScan)||0},
   ];
   const changes=[];
   for(const f of fields){
@@ -1449,9 +1608,7 @@ async function saveInlineEdit(id){
   const note=noteEl?noteEl.value.trim():'';
   const saveBtn=document.querySelector(`#inline-edit-${id} button`);
   if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='กำลังบันทึก...';}
-  for(const c of changes){
-    await fbSet('accounts/'+id+'/'+c.fbPath,c.newVal);
-  }
+  for(const c of changes){await fbSet('accounts/'+id+'/'+c.fbPath,c.newVal);}
   const detail=changes.map(c=>`${c.label}: ${fmt(c.cur)} → ${fmt(c.newVal)}`).join(' | ')+(note?' | หมายเหตุ: '+note:'');
   const editLog={
     type:'แก้ไขยอด',accId:id,accName:a?.name||'',
@@ -1461,7 +1618,6 @@ async function saveInlineEdit(id){
   };
   await fbPush('updates',editLog);
   markClean(id);
-  // Now safe to re-render this card
   toggleEditPanel(id);
   if(saveBtn){saveBtn.disabled=false;saveBtn.textContent='💾 บันทึก';}
   showToast('✅ บันทึกแล้ว','ok');
@@ -1476,6 +1632,7 @@ function goPage(p){
   document.querySelectorAll('.nav-item')[pages.indexOf(p)].classList.add('active');
   local.lastPage=p; saveLocal();
   if(p==='dashboard'){renderDashboard();renderOnline();renderDashTGGroups();}
+  if(p==='update'){render3amFields();render3amTGGroups();}
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 
@@ -1484,26 +1641,6 @@ function showToast(msg,type){
   t.textContent=msg; t.className='toast show '+(type||'');
   clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3000);
 }
-
-// Missing CSS classes referenced in accMini
-document.head.insertAdjacentHTML('beforeend',`<style>
-.acc-card{background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:13px;margin-bottom:10px;width:100%;min-width:0;box-sizing:border-box;}
-.acc-card.frozen{border-color:rgba(240,79,79,.5);background:rgba(240,79,79,.04);}
-.acc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:6px;width:100%;min-width:0;}
-.acc-name{font-weight:700;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.acc-brand{font-size:11px;color:var(--purple);font-weight:600;margin-top:1px;}
-.acc-num{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:1px;}
-.badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
-.bg-green{background:rgba(45,214,123,.15);color:var(--green);}
-.bg-red{background:rgba(240,79,79,.2);color:var(--red);}
-.bg-yellow{background:rgba(245,183,49,.15);color:var(--yellow);}
-.bg-blue{background:rgba(74,143,255,.15);color:var(--blue);}
-.bg-purple{background:rgba(155,108,255,.15);color:var(--purple);}
-.bal-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;width:100%;min-width:0;}
-.bal-box{background:var(--s3);border-radius:8px;padding:9px 10px;min-width:0;overflow:hidden;}
-.bal-label{font-size:10px;color:var(--muted);margin-bottom:3px;}
-.bal-val{font-family:var(--mono);font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-</style>`);
 
 window.addEventListener('load',()=>{if(cfg&&cfg.url)launchApp();});
 </script>

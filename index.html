@@ -564,20 +564,10 @@ async function doLogin(){
     errEl.textContent='❌ Firebase URL ไม่ถูกต้อง'; return;
   }
   if(!team){errEl.textContent='❌ กรอกชื่อทีมด้วย'; return;}
-  btn.disabled=true; btn.textContent='กำลังเชื่อมต่อ...';
-  try{
-    const ac=new AbortController();
-    const tid=setTimeout(()=>ac.abort(),8000);
-    const r=await fetch(url+'/.json?shallow=true',{signal:ac.signal});
-    clearTimeout(tid);
-    if(!r.ok&&r.status!==404&&r.status!==400)throw new Error('HTTP '+r.status);
-  }catch(e){
-    errEl.textContent=e.name==='AbortError'?'❌ หมดเวลา ตรวจสอบเน็ต':'❌ เชื่อมต่อไม่ได้ ตรวจสอบ URL และ Rules';
-    btn.disabled=false; btn.textContent='🚀 เข้าใช้งาน'; return;
-  }
+  // ข้ามการ test connection (อาจถูกบล็อก CORS) — เชื่อมตรงผ่าน Firebase SSE
   cfg={url,team};
   localStorage.setItem('fw_cfg3',JSON.stringify(cfg));
-  DB=url; btn.disabled=false; btn.textContent='🚀 เข้าใช้งาน';
+  DB=url;
   launchApp();
 }
 
@@ -840,17 +830,38 @@ function updateShiftDisplay(){
 
 // ── FIREBASE ──
 function fbUrl(p){return DB+'/'+p+'.json';}
-async function fbSet(p,d){await fetch(fbUrl(p),{method:'PUT',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}});}
-async function fbPush(p,d){const r=await fetch(fbUrl(p),{method:'POST',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}});return r.json();}
-async function fbDel(p){await fetch(fbUrl(p),{method:'DELETE'});}
+async function fbSet(p,d){
+  try{
+    const r=await fetch(fbUrl(p),{method:'PUT',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}});
+    if(!r.ok&&r.status===401)showToast('❌ Firebase Rules: ไม่มีสิทธิ์เขียน','err');
+  }catch(e){console.warn('fbSet error',p,e);}
+}
+async function fbPush(p,d){
+  try{
+    const r=await fetch(fbUrl(p),{method:'POST',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}});
+    if(!r.ok){console.warn('fbPush',r.status);return {};}
+    return r.json();
+  }catch(e){console.warn('fbPush error',p,e);return {};}
+}
+async function fbDel(p){
+  try{await fetch(fbUrl(p),{method:'DELETE'});}catch(e){console.warn('fbDel error',p,e);}
+}
 
 function fbListen(path,cb){
-  const es=new EventSource(DB+'/'+path+'.json');
-  es.addEventListener('put',e=>{try{const data=JSON.parse(e.data).data;cb(data,'put');}catch(x){}});
-  es.addEventListener('patch',e=>{try{const data=JSON.parse(e.data).data;if(data)cb(data,'patch');}catch(x){}});
-  es.onerror=()=>setSyncStatus(false);
-  es.onopen=()=>setSyncStatus(true);
-  return()=>es.close();
+  const url=DB+'/'+path+'.json';
+  let es;
+  function connect(){
+    es=new EventSource(url);
+    es.addEventListener('put',e=>{try{const data=JSON.parse(e.data).data;cb(data,'put');}catch(x){}});
+    es.addEventListener('patch',e=>{try{const data=JSON.parse(e.data).data;if(data)cb(data,'patch');}catch(x){}});
+    es.onerror=()=>{
+      setSyncStatus(false);
+      // EventSource will auto-retry; don't force reconnect manually
+    };
+    es.onopen=()=>setSyncStatus(true);
+  }
+  connect();
+  return()=>{if(es)es.close();};
 }
 
 function setSyncStatus(ok){
